@@ -2,7 +2,7 @@
 Proyecto: PRACTICA MISE Micros 16bits
 Fichero: Main_IO_G0_MISE_v0.c
 
-Grupo: G0    Autor: Luis
+Grupo: G0    Autor: Susana & Husein
 v0.1	Fecha: 15-X-2018
 
 Descripci?n:
@@ -28,7 +28,26 @@ void configura_CN_int(void)
     IE_PULSADOR_S4=1;
     _CNIE=1;
     
+       
     
+}
+
+
+
+void delay_ms (int milis) //milisegundos
+{
+    int cnt=0;
+    
+    while(cnt<milis)
+    {
+        if (milis_F ==1)
+        {
+            cnt++;  
+            milis_F=0;
+            
+        }
+               
+    }
     
     
     
@@ -36,11 +55,12 @@ void configura_CN_int(void)
 
 
 
-
 int main(void)
 {
 Nop();
 Nop();
+
+
 //Inic_Oscilador ();	//Configura Frecuencia del Oscilador Principal a 80Mhz 
 //
     AD1PCFGL= 0xFFFF;   // Pone todas las patas anal?gicas de I/O digital
@@ -50,9 +70,12 @@ Nop();
 // Inicializaciones 
 Nop();
 Nop();
+   // Inic_Oscilador ();
+    Inic_Timer_X ('1', '1', 4000);
     configura_CN_int();
     Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
     Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
+    Init_LCD();
     
 // ========================
 // Bucle Principal
@@ -60,6 +83,13 @@ Nop();
     {
 Nop();
 Nop();
+
+if (flag_1s ==1)
+{
+    
+    Led_D3=!Led_D3;
+    flag_1s=0;
+}
    /* if (pulsador_S4 == pulsador_OFF)
     {
         Led_D3= ON;

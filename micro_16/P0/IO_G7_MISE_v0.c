@@ -16,6 +16,8 @@ v0.0	Fecha: 15-X-2018
 #include "Explorer16_G7_MISE_v0.h"
 //#include "IO_G0_MISE_v0.h"
 
+int contador_5ms=0, flag_1s=0,milis_F;
+
 
 // ============================================
 void Inic_Leds ()// Inicializa LEDS  Explorer16: RA0, ..., RA7
@@ -88,4 +90,23 @@ void _ISR _CNInterrupt(void)
    }
    _CNIF=0;
     
+}
+
+void _ISR _T1Interrupt(void)
+{
+    
+    milis_F=1;
+    if (contador_5ms <800)
+    {
+        contador_5ms++;
+    }
+    
+    else
+    {
+        flag_1s=1;
+        contador_5ms=0;
+    }
+    
+    
+    _T1IF=0;
 }
