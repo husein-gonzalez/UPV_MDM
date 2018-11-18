@@ -13,11 +13,13 @@ Descripci?n:
  */
 
 #include "p24HJ256GP610A.h"
-#include "Explorer16_G7_MISE_v0.h"
+//#include "Explorer16_G7_MISE_v0.h"
 #include "IO_G7_MISE_v0.h"
+#include "leds_G7.h"
+#include "lcd_G7.h"
+#include "buttons_G7.h"
 
-
-
+extern void SYS_Initialize ( void ) ;
 
 
 void configura_CN_int(void)
@@ -60,23 +62,17 @@ int main(void)
 Nop();
 Nop();
 
-
-//Inic_Oscilador ();	//Configura Frecuencia del Oscilador Principal a 80Mhz 
-//
-    AD1PCFGL= 0xFFFF;   // Pone todas las patas anal?gicas de I/O digital
-    AD1PCFGH= 0xFFFF;   // Por defecto las patas anal?gicas est?n habilitadas
-
-    // ========================
 // Inicializaciones 
-Nop();
-Nop();
+
+SYS_Initialize();
+        /*
    // Inic_Oscilador ();
     Inic_Timer_X ('1', '1', 4000);
     configura_CN_int();
     Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
     Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
     Init_LCD();
-    
+  */  
 // ========================
 // Bucle Principal
     while(1)
@@ -87,19 +83,16 @@ Nop();
 if (flag_1s ==1)
 {
     
-    Led_D3=!Led_D3;
+  //  Led_D3=!Led_D3;
+    LED_Toggle(LED_D3);
     flag_1s=0;
 }
-   /* if (pulsador_S4 == pulsador_OFF)
+
+/*
+    if (pulsador_S4 == pulsador_OFF)
     {
         Led_D3= ON;
-        Led_D4= ON;
-        Led_D5= ON;
-        Led_D6= ON;
-        Led_D7= ON;
-        Led_D8= ON;
-        Led_D9= ON;
-        Led_D10= ON;
+
         
     }
 Nop();
@@ -107,13 +100,7 @@ Nop();
     if (pulsador_S4 == pulsador_ON)
     {
         Led_D3= OFF;
-        Led_D4= OFF;
-        Led_D5= OFF;
-        Led_D6= OFF;
-        Led_D7= OFF;
-        Led_D8= OFF;
-        Led_D9= OFF;
-        Led_D10= OFF;
+
     }
 */
   } // Fin while(1)
