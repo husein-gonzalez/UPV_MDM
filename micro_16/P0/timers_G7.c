@@ -12,7 +12,9 @@ v2.0 Fecha: 15-X-2018
  */
 #include "p24HJ256GP610A.h"
 #include "Explorer16_G7_MISE_v0.h"
-#include "Timers_G7_MISE_v0.h"
+//#include "Timers_G7_MISE_v0.h"
+#include "system_G7.h"
+
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 #define Timer_X 1 // Timer 16 bits a utilizar
 #if (Timer_X == 1)
@@ -35,6 +37,7 @@ v2.0 Fecha: 15-X-2018
 #error ("TIMER NO DEFINIDO")
 #endif
 unsigned char Tx_flag;
+int milis_F=0;
 //=======================================
 void Inic_Timer_X (unsigned char timer, unsigned char unidades, unsigned int tiempo)
  // Timer-> 1 a 6, Tiempo, unidades-> 0= microsegundos, 1= milisegundos
@@ -58,3 +61,23 @@ void Inic_Timer_67 () //
 {
 
 } 
+
+
+void delay_ms (int milis) //milisegundos
+{
+    int cnt=0;
+    
+    while(cnt<milis)
+    {
+        if (milis_F ==1)
+        {
+            cnt++;  
+            milis_F=0;
+            
+        }
+               
+    }
+    
+    
+    
+}

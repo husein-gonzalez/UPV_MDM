@@ -1,5 +1,5 @@
 /* 
- * File:   Timers_Gx_MISE_v0.h
+ * File:   timers_G7.h
  * Author: 109229
  *
  * Created on 16 de noviembre de 2018, 16:23
@@ -12,8 +12,13 @@
 extern "C" {
 #endif
 
+//cabeceras
+    
+    #include "system_G7.h"
 
-
+    extern int milis_F;
+    void Inic_Timer_X (unsigned char timer, unsigned char unidades, unsigned int tiempo);
+    void delay_ms (int milis); //milisegundos
 
 #ifdef	__cplusplus
 }

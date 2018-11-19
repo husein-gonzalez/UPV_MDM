@@ -15,4 +15,4 @@ void Inic_Leds (); // Inicializa LEDS placa Explorer16: RA0, ..., RA7
 void Inic_Pulsadores (); // Inicializa pulsadores Explorer16: S3,S4,S5,S6
 
 
-extern int contador_5ms, flag_1s,milis_F;
+//extern int contador_5ms, flag_1s,milis_F;

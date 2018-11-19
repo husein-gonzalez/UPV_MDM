@@ -1,6 +1,7 @@
 
 #include "p24HJ256GP610A.h"
 #include "Explorer16_G7_MISE_v0.h"
+#include "system_G7.h"
 
 
 /***** LCD COMANDOS *****/

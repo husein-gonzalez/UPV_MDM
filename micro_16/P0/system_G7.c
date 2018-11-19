@@ -9,6 +9,7 @@
 */
 
 #include "p24hj256gp610A.h"
+#include "system_G7.h"
 
 /*
 **	Oscillator Mode: Register FOSCSEL
@@ -44,7 +45,7 @@
 ** al inicio de un fichero .C, fuera de ninguna funcion
 ** Para ver configuraci?n -> (ir a: Window -> PIC Memory Views -> Configuration Bits
 */
-
+/*
 //=========================================================================
 // 
 #pragma config FNOSC = PRIPLL  	// Oscillator Primario (XT, HS, EC) con PPL
@@ -53,7 +54,7 @@
 #pragma config POSCMD = XT      // XT oscillator                           
 #pragma config FWDTEN = OFF     // Watchdog Timer: Disabled
 // Estas PRAGMA se ejecutan al grabar el programa
-
+*/
 //===========================================================================
 void Inic_Oscilador (void)
 {

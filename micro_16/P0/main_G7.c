@@ -2,7 +2,7 @@
 Proyecto: PRACTICA MISE Micros 16bits
 Fichero: Main_IO_G0_MISE_v0.c
 
-Grupo: G0    Autor: Susana & Husein
+Grupo: G7    Autor: Susana & Husein
 v0.1	Fecha: 15-X-2018
 
 Descripci?n:
@@ -18,8 +18,13 @@ Descripci?n:
 #include "leds_G7.h"
 #include "lcd_G7.h"
 #include "buttons_G7.h"
+#include "system_G7.h"
+#include "interrupts_G7.h"
+
 
 extern void SYS_Initialize ( void ) ;
+
+
 
 
 void configura_CN_int(void)
@@ -36,24 +41,7 @@ void configura_CN_int(void)
 
 
 
-void delay_ms (int milis) //milisegundos
-{
-    int cnt=0;
-    
-    while(cnt<milis)
-    {
-        if (milis_F ==1)
-        {
-            cnt++;  
-            milis_F=0;
-            
-        }
-               
-    }
-    
-    
-    
-}
+
 
 
 

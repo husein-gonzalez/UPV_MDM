@@ -18,6 +18,8 @@ v0.0	Fecha: 15-X-2018
 //#include "IO_G0_MISE_v0.h"
 
 #include "leds_G7.h"
+#include <stdbool.h>
+#include "system_G7.h"
 
 #define LED_D3_LAT      LATAbits.LATA0
 #define LED_D4_LAT      LATAbits.LATA1
@@ -67,35 +69,35 @@ void LED_On(LED led)
     switch(led)
     {
         case LED_D3:
-            LED_D3 = LED_ON ;
+            LED_D3_LAT = LED_ON ;
             break ;
 
         case LED_D4:
-            LED_D4 = LED_ON ;
+            LED_D4_LAT = LED_ON ;
             break ;
 
         case LED_D5:
-            LED_D5 = LED_ON;
+            LED_D5_LAT = LED_ON;
             break;
 
         case LED_D6:
-            LED_D6 = LED_ON;
+            LED_D6_LAT = LED_ON;
             break;
 
         case LED_D7:
-            LED_D7 = LED_ON;
+            LED_D7_LAT = LED_ON;
             break;
 
         case LED_D8:
-            LED_D8 = LED_ON;
+            LED_D8_LAT = LED_ON;
             break;
 
         case LED_D9:
-            LED_D9 = LED_ON ;
+            LED_D9_LAT = LED_ON ;
             break ;
 
         case LED_D10:
-            LED_D10 = LED_ON ;
+            LED_D10_LAT = LED_ON ;
             break ;
 
         default:
@@ -124,35 +126,35 @@ void LED_Off(LED led)
     switch(led)
     {
         case LED_D3:
-            LED_D3 = LED_OFF ;
+            LED_D3_LAT = LED_OFF ;
             break ;
 
         case LED_D4:
-            LED_D4 = LED_OFF ;
+            LED_D4_LAT = LED_OFF ;
             break ;
 
         case LED_D5:
-            LED_D5 = LED_OFF;
+            LED_D5_LAT = LED_OFF;
             break;
 
         case LED_D6:
-            LED_D6 = LED_OFF;
+            LED_D6_LAT = LED_OFF;
             break;
 
         case LED_D7:
-            LED_D7 = LED_OFF;
+            LED_D7_LAT = LED_OFF;
             break;
 
         case LED_D8:
-            LED_D8 = LED_OFF;
+            LED_D8_LAT = LED_OFF;
             break;
 
         case LED_D9:
-            LED_D9 = LED_OFF ;
+            LED_D9_LAT = LED_OFF ;
             break ;
 
         case LED_D10:
-            LED_D10 = LED_OFF ;
+            LED_D10_LAT = LED_OFF ;
             break ;
 
         default:
@@ -181,35 +183,35 @@ void LED_Toggle(LED led)
     switch(led)
     {
         case LED_D3:
-            LED_D3 ^= 1;
+            LED_D3_LAT ^= 1;
             break;
 
         case LED_D4:
-            LED_D4 ^= 1;
+            LED_D4_LAT ^= 1;
             break;
 
         case LED_D5:
-            LED_D5 ^= 1;
+            LED_D5_LAT ^= 1;
             break;
 
         case LED_D6:
-            LED_D6 ^= 1;
+            LED_D6_LAT ^= 1;
             break;
 
         case LED_D7:
-            LED_D7 ^= 1;
+            LED_D7_LAT ^= 1;
             break;
 
         case LED_D8:
-            LED_D8 ^= 1;
+            LED_D8_LAT ^= 1;
             break;
 
         case LED_D9:
-            LED_D9 ^= 1;
+            LED_D9_LAT ^= 1;
             break;
 
         case LED_D10:
-            LED_D10 ^= 1;
+            LED_D10_LAT ^= 1;
             break;
 
         default:
@@ -238,28 +240,28 @@ bool LED_Get(LED led)
     switch(led)
     {
         case LED_D3:
-            return ( ( LED_D3 == LED_ON ) ? true : false ) ;
+            return ( ( LED_D3_LAT == LED_ON ) ? true : false ) ;
 
         case LED_D4:
-            return ( ( LED_D4 == LED_ON ) ? true : false ) ;
+            return ( ( LED_D4_LAT == LED_ON ) ? true : false ) ;
 
         case LED_D5:
-            return ( (LED_D5 == LED_ON) ? true : false );
+            return ( (LED_D5_LAT == LED_ON) ? true : false );
 
         case LED_D6:
-            return ( (LED_D6 == LED_ON) ? true : false );
+            return ( (LED_D6_LAT == LED_ON) ? true : false );
 
         case LED_D7:
-            return ( (LED_D7 == LED_ON) ? true : false );
+            return ( (LED_D7_LAT == LED_ON) ? true : false );
 
         case LED_D8:
-            return ( (LED_D8 == LED_ON) ? true : false );
+            return ( (LED_D8_LAT == LED_ON) ? true : false );
 
         case LED_D9:
-            return ( ( LED_D9 == LED_ON ) ? true : false ) ;
+            return ( ( LED_D9_LAT == LED_ON ) ? true : false ) ;
 
         case LED_D10:
-            return ( ( LED_D10 == LED_ON ) ? true : false ) ;
+            return ( ( LED_D10_LAT == LED_ON ) ? true : false ) ;
 
         default:
             break;
@@ -326,8 +328,6 @@ void LED_Enable(LED led)
 
 
 
-
-int contador_5ms=0, flag_1s=0,milis_F;
 
 
 // ============================================

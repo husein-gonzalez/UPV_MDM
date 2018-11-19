@@ -4,6 +4,8 @@
 
 
 
+
+
 /** Type definitions *********************************/
 typedef enum
 {
@@ -90,7 +92,7 @@ void LED_Toggle(LED led);
 * Output: true if on, false if off
 *
 ********************************************************************/
-bool LED_Get(LED led);
+//bool LED_Get(LED led);
 
 /*********************************************************************
 * Function: bool LED_Enable(LED led);

@@ -1,24 +1,10 @@
-/*
-Proyecto: MISE Micros 16bits 
-Fichero: IO_G0__MISE_v0.c
 
-Grupo: G0    Autor: Luis
-v0.0	Fecha: 15-X-2018
-
- Descripci?n
- * Inicializa la pata asociada al led D3 y lo deja apagado
- * 
- * Inicializa la pata asociada al pulsadpr S4
- * Requiere fichero: IO_G0_v0.h
- */
-
-#include "p24HJ256GP610A.h"
-#include "Explorer16_G7_MISE_v0.h"
-//#include "IO_G0_MISE_v0.h"
-
-int contador_5ms=0, flag_1s=0,milis_F;
+#include "system_G7.h"
+#include "interrupts_G7.h"
 
 
+
+int contador_5ms=0, flag_1s=0;
 
 
 

@@ -28,7 +28,7 @@ v0.0	Fecha: 15-X-2018
 #define  Led_D8 LATAbits.LATA5
 #define  Led_D9 LATAbits.LATA6
 #define  Led_D10 LATAbits.LATA7
-  /*
+  */
 
 #define  pulsador_S4 PORTDbits.RD13
 
