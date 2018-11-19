@@ -12,6 +12,10 @@
 extern "C" {
 #endif
 
+    
+    #define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
+    
+    
 #include "p24HJ256GP610A.h"
 //#include "Explorer16_G7_MISE_v0.h"
 #include "IO_G7_MISE_v0.h"
@@ -20,6 +24,10 @@ extern "C" {
 #include "buttons_G7.h"
 #include "timers_G7.h"
 #include "interrupts_G7.h"
+#include "uart_G7.h"
+    
+    
+ 
     
     
 

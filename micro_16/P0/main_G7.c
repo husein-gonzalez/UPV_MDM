@@ -74,6 +74,7 @@ if (flag_1s ==1)
   //  Led_D3=!Led_D3;
     LED_Toggle(LED_D3);
     flag_1s=0;
+    putRS232_2("c");
 }
 
 /*

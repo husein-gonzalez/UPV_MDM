@@ -96,5 +96,6 @@ void SYS_Initialize ( void )
     Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
     Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
     Init_LCD();
+    Inic_RS232_2 ();
 }
 
