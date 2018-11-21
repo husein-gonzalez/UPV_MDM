@@ -90,7 +90,10 @@ void Inic_RS232_2 (void )
 // _PDSEL_U2 =; // Paridad: 00= 8 bits sin paridad
 // _STSEL_U2 =; // Duración bit Stop 
  
- U2BRG = 0x67 ;//103
+ //U2BRG = 0x19 ;//25
+  U2BRG = 0x67 ;//103
+ 
+ //U2BRG =BAUD_RATEREG_2_BRGH0;
  U2STA = 0;
 // _UTXISEL1_U2 =; // Tipo Interrupción Transmisión
 // _UTXINV_U2 =; // Invierte polaridad pata transmisión
@@ -137,7 +140,8 @@ Nop();
 void putRS232_2( char c) // Envía por encuesta un caracter
 {
  while ( _UTXBF_U2 == 1); // Espera mientras buffer Tx está lleno
- U2TXREG = 0x33; // Carga dato a transmitir
+ //U2TXREG = 0x33; // Carga dato a transmitir
+ U2TXREG = 0x44; // Carga dato a transmitir
 // return c;
 } // FINputRS232_2
 // Espera a recibir un caracter por la UART2

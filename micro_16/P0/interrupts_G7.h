@@ -14,7 +14,7 @@ extern "C" {
 
 
     
-    extern int contador_5ms, flag_1s;
+    extern int contador_1ms, flag_1s;
 
 
 #ifdef	__cplusplus

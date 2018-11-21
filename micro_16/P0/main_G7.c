@@ -47,8 +47,12 @@ void configura_CN_int(void)
 
 int main(void)
 {
+    
+    uint64_t tiempo_exec;
 Nop();
 Nop();
+
+char caracter='a';
 
 // Inicializaciones 
 
@@ -65,8 +69,17 @@ SYS_Initialize();
 // Bucle Principal
     while(1)
     {
+        
+        
 Nop();
 Nop();
+
+
+tiempo_exec=time_diff(0);  //0 empieza el contador, 1 devuelve tiempo transcurrido
+delay_ms(5);
+tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
+
+//FIXME: sacar tiempo transcurrido por LCD o UART
 
 if (flag_1s ==1)
 {
@@ -74,7 +87,17 @@ if (flag_1s ==1)
   //  Led_D3=!Led_D3;
     LED_Toggle(LED_D3);
     flag_1s=0;
-    putRS232_2("c");
+    putRS232_2(caracter);
+    
+    
+//    if(caracter<0x7a)
+//    {
+//        caracter++;
+//       
+//    }
+//    else
+//        caracter=0x41;
+        
 }
 
 /*

@@ -17,6 +17,7 @@ extern "C" {
     #include "system_G7.h"
 
     extern int milis_F;
+    extern uint64_t t67_contador;
     void Inic_Timer_X (unsigned char timer, unsigned char unidades, unsigned int tiempo);
     void delay_ms (int milis); //milisegundos
 
