@@ -107,6 +107,18 @@ for(i=0; i<16; i++, j++)
       }      
 } //FIN Mensaje_FLASH_Ventana_DATOS
 
+void escribir_UART(char* txtPrintable)
+{
+    int i=0;
+    
+    for(i=0;i<16;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }
+}
+
+
 
 
 void EnvioDatosLCD(char* txtPrintable)
@@ -219,7 +231,11 @@ Inicializacion_variables();
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
-        putRS232_2(caracter);
+        escribir_UART(Texto_1);
+
+
+        putRS232_2(0x0D);
+        putRS232_2(0x0A);
 
 
     //    if(caracter<0x7a)

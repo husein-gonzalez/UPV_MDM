@@ -12,6 +12,10 @@
 #include "system_G7.h"
 
 /*
+* Programa el PLL para la frecuencia del Oscilador Principal a 80MHz
+*/
+
+/*
 **	Oscillator Mode: Register FOSCSEL
 **     FNOSC_FRC            Internal Fast RC (FRC)
 **     FNOSC_FRCPLL         Internal Fast RC (FRC) con PLL
@@ -48,12 +52,11 @@
 
 //=========================================================================
 // 
-
-//#pragma config FNOSC = PRIPLL  	// Oscillator Primario (XT, HS, EC) con PPL  FIXME : posiblemente MAL!
-//#pragma config FCKSM = CSECMD   // Only clock switching enabled
-//#pragma config OSCIOFNC = OFF   // OSC2 is clock O/P
-//#pragma config POSCMD = XT      // XT oscillator                           
-//#pragma config FWDTEN = OFF     // Watchdog Timer: Disabled
+#pragma config FNOSC = PRIPLL  	// Oscillator Primario (XT, HS, EC) con PPL
+#pragma config FCKSM = CSECMD   // Only clock switching enabled
+#pragma config OSCIOFNC = OFF   // OSC2 is clock O/P
+#pragma config POSCMD = XT      // XT oscillator                           
+#pragma config FWDTEN = OFF     // Watchdog Timer: Disabled
 // Estas PRAGMA se ejecutan al grabar el programa
 
 //===========================================================================
@@ -89,7 +92,7 @@ void Inic_Oscilador (void)
 
 void SYS_Initialize ( void )
 {
-    //Inic_Oscilador ();
+    Inic_Oscilador ();
     AD1PCFGL= 0xFFFF;   // Pone todas las patas anal?gicas de I/O digital
     AD1PCFGH= 0xFFFF;   // Por defecto las patas anal?gicas est?n habilitadas
     Inic_Timer_X ('1', '1', 4000);// si oscilador == 8MHz => tiempo=4000. si oscilador ==80MHz =>5000 con prescaler ==8 (TCKPS=0b01)
