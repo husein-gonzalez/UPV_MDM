@@ -12,8 +12,9 @@
 extern "C" {
 #endif
 
-
-
+#define long_linea 16
+#define num_lineas 2
+extern unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
 
 #ifdef	__cplusplus
 }

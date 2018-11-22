@@ -14,7 +14,7 @@ v0.0	Fecha: 15-X-2018
  */
 
 #include "p24HJ256GP610A.h"
-#include "Explorer16_G7_MISE_v0.h"
+//#include "Explorer16_G7_MISE_v0.h"
 //#include "IO_G0_MISE_v0.h"
 
 #include "leds_G7.h"

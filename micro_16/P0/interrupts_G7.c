@@ -31,6 +31,7 @@ void _ISR _T1Interrupt(void)
 {
     
     milis_F=1; //flag de 1ms
+    milis_F2=1; //flag de 1ms
     
     if (contador_1ms <1000)
     {

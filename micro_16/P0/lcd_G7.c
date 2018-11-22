@@ -1,6 +1,6 @@
 
 #include "p24HJ256GP610A.h"
-#include "Explorer16_G7_MISE_v0.h"
+//#include "Explorer16_G7_MISE_v0.h"
 #include "system_G7.h"
 
 
@@ -25,6 +25,11 @@
 #define TRISDATA TRISE // I/O setup for data Port
 
 
+
+unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
+
+
+
 //========= Envio de COMANDO =========
 void lcd_cmd( char cmd ) //
 {
@@ -33,6 +38,9 @@ void lcd_cmd( char cmd ) //
  DATA &= 0xFF00; // prepare RD0 - RD7
  DATA |= cmd; // command byte to lcd
  E = 1; // toggle E line
+ Nop();
+ Nop();
+ Nop();
  Nop();
  //- - - CALCULA CUANTOS NOPs SON NECESARIOS - - -
  Nop();
@@ -49,6 +57,15 @@ void lcd_data( char data ) //
  DATA &= 0xFF00; // prepare RD0 - RD7
  DATA |= data; // data byte to lcd
  E = 1;
+ Nop();
+ Nop();
+ Nop();
+ Nop();
+ Nop();
+ Nop();
+ Nop();
+ Nop();
+ Nop();
  Nop();
 // - - - CALCULA CUANTOS NOPs SON NECESARIOS - - -
  Nop();
@@ -87,7 +104,7 @@ void Init_LCD (void )
  delay_ms( 1 ); //Bucle de 40us bloqueante
  lcd_cmd(entry_mode); // entry mode set (0x06)
  delay_ms( 1 ); //Bucle de 40us bloqueante
- lcd_data(0x33);
+ //lcd_data(0x33);
  
  //Inic_Timer_LCD_Int ();
 }

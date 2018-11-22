@@ -11,7 +11,7 @@ v2.0 Fecha: 15-X-2018
  * Requiere fichero: Timers_G0_MISE_v2.h
  */
 #include "p24HJ256GP610A.h"
-#include "Explorer16_G7_MISE_v0.h"
+//#include "Explorer16_G7_MISE_v0.h"
 //#include "Timers_G7_MISE_v0.h"
 #include "system_G7.h"
 
@@ -90,6 +90,7 @@ v2.0 Fecha: 15-X-2018
 
 unsigned char Tx_flag;
 int milis_F=0;
+int milis_F2=0;
 uint64_t t67_contador=0;
 
 
