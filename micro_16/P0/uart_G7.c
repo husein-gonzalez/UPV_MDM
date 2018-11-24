@@ -11,11 +11,15 @@
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 //================================================================
 // Cálculos de tiempos y baudios
-#define Fosc 8000000 //Frecuencia oscilador CPU
-#define Fcy Fosc/2
+#define Fosc0 8000000 //Frecuencia oscilador CPU
+#define Fosc1 80000000 //Frecuencia oscilador CPU
+#define Fcy0 Fosc0/2
+#define Fcy1 Fosc1/2
 #define BAUDRATE2 9600 // baudios (bits/sg) de transmision
-#define BAUD_RATEREG_2_BRGH1 ((Fcy/BAUDRATE2)/4)-1 // Para BRGH = 1
-#define BAUD_RATEREG_2_BRGH0 ((Fcy/BAUDRATE2)/16)-1 // Para BRGH = 0
+#define BAUD_RATEREG_2_BRGH10 ((Fcy0/BAUDRATE2)/4)-1 // Para BRGH = 1
+#define BAUD_RATEREG_2_BRGH00 ((Fcy0/BAUDRATE2)/16)-1 // Para BRGH = 0
+#define BAUD_RATEREG_2_BRGH11 ((Fcy1/BAUDRATE2)/4)-1 // Para BRGH = 1
+#define BAUD_RATEREG_2_BRGH01 ((Fcy1/BAUDRATE2)/16)-1 // Para BRGH = 0
 //===============================================================
 // Reg/bits UART2 serial port: U2MODE y U2STA no definidos en P24FJ12GA010A.h
 // U2MODE
@@ -64,8 +68,11 @@
 #define clrscr "\x1b[2J" // Borra pantalla 0x1b, '[','2','J'
 #define home "\x1b[H" // Cursor inicio
 //========================================================
-void Inic_RS232_2 (void )
+void Inic_RS232_2 (int freq ) //freq = 0 => 8MHz, freq= 1 => 80Mhz
 {
+    
+    if(freq==0)
+    {
 // No requerido, lo hace el hardware
 // UART2_TX_TRIS = 0;
 // UART2_RX_TRIS = 1;
@@ -86,7 +93,7 @@ void Inic_RS232_2 (void )
  _BRGH_U2 = 1; // BRGH 0 / 1
 // _PDSEL_U2 =; // Paridad: 00= 8 bits sin paridad
 // _STSEL_U2 =; // Duración bit Stop
- U2BRG = BAUD_RATEREG_2_BRGH1 ;
+ U2BRG = BAUD_RATEREG_2_BRGH10 ;
  U2STA = 0;
 // _UTXISEL1_U2 =; // Tipo Interrupción Transmisión
 // _UTXINV_U2 =; // Invierte polaridad pata transmisión
@@ -124,6 +131,31 @@ Nop();
  //U2TXREG = 0; // Transmite caracter 0x00 (nulo))
 
  //DMA0CONbits.CHEN = 1; //Inicia DMA
+    }
+    
+    else
+    {
+       U2MODE = 0x00; // 8bits, sin paridad, 1 stop, Uart parada
+
+ _BRGH_U2 = 1; // BRGH 0 / 1
+ U2BRG = BAUD_RATEREG_2_BRGH11 ;
+ U2STA = 0;
+ _U2TXIP =4; // Prioridad en recepción
+ _U2RXIP = 4; // Prioridad en recepción
+ _U2RXIF = 0; // Borra flag int. RX
+ _U2TXIF = 0; // Borra flag int. TX
+ _U2EIF = 0; // Boorra flag de Error UART
+ _U2TXIE = 0; // Habilita int. de transmisión
+ _U2RXIE = 0;
+ _U2EIE = 0; // Habilita Int_ de Error UART 
+  _OERR_U2=0; // Según versión corrige bugg
+ _UARTEN_U2 = 1; // Habilita la UART_2
+ _UTXEN_U2 = 1; //Habilita transmisión, Debe activarse despues habilitar UART
+Nop();
+Nop();
+Nop();
+ 
+    }
 } // FIN: Inic_RS232_2
 //========= ENCUESTRA ====================================
 void putRS232_2( char c) // Envía por encuesta un caracter

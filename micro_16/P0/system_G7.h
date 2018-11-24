@@ -30,7 +30,9 @@ extern "C" {
     
     
  
-    
+ void toggle_osc_8_80(void);   
+ 
+ extern int osc_8_80_F;
     
 
 

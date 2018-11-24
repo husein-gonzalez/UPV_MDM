@@ -27,8 +27,9 @@ int Str_i, Str_j;
 int EscrituraLCD;
 int columnaLCD;
 
-const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
-                         "=== Pulsa S3 ==="};    // 16 caracteres línea 2 
+char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+                         "=== Pulsa S3 ==="    // 16 caracteres línea 2 
+                         "Freq =          " }; // 16 caracteres línea 3, rellenar con info de oscilador 
 
 enum{
     DATO,
@@ -106,6 +107,27 @@ void escribir_UART(char* txtPrintable)
         putRS232_2(txtPrintable[i]);
         delay_ms(1);
     }
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
+    
+        for(i=16;i<32;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }    
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
+    
+    for(i=32;i<48;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }    
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
 }
 
 
@@ -181,6 +203,7 @@ Nop();
 Nop();
 
 char caracter='a';
+char osc_freq=0;
 
 // Inicializaciones 
 
@@ -224,8 +247,6 @@ Inicializacion_variables();
         escribir_UART(Texto_1);
 
 
-        putRS232_2(0x0D);
-        putRS232_2(0x0A);
 
 
     //    if(caracter<0x7a)
@@ -239,14 +260,20 @@ Inicializacion_variables();
     }
     if (S3_F==1)
     {
-        LED_Sweep_Left();
         S3_F=0;
+        LED_Sweep_Left();
+        toggle_osc_8_80();        
+        osc_freq=OSCCONbits.COSC;        
+        Texto_1[40]= osc_freq;
+        
+        
     }
     
         if (S6_F==1)
     {
-        LED_Sweep_Right();
         S6_F=0;
+        LED_Sweep_Right();
+        
     }
 
 /*
