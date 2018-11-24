@@ -14,14 +14,14 @@ extern "C" {
 
 #include "system_G7.h"
 
-    
-    //#define TRIS_PULSADOR_S4 _TRISD6
+
+#define IE_PULSADOR_S3 _CN15IE
 #define IE_PULSADOR_S4 _CN19IE
-    
-    
-    #define pulsador_S3  PORTDbits.RD6
+#define IE_PULSADOR_S6 _CN16IE
+   
+#define pulsador_S3  PORTDbits.RD6
 #define pulsador_S6  PORTDbits.RD7
-#define pulsador_S5  PORTAbits.RA7       //Overlaps with D10
+#define pulsador_S5  PORTAbits.RA7       //solapa con D10
 #define pulsador_S4  PORTDbits.RD13
 
 #define pulsador_S3_TRIS  TRISDbits.TRISD6

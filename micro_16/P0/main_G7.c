@@ -47,17 +47,7 @@ void Inicializacion_variables(void)
 }
 
 
-void configura_CN_int(void)
-{
-    
-    _CNIP=4;
-    _CNIF=0;
-    IE_PULSADOR_S4=1;
-    _CNIE=1;
-    
-       
-    
-}
+
 /*
 uint8_t valor = 0x35;
 
@@ -246,6 +236,17 @@ Inicializacion_variables();
     //    else
     //        caracter=0x41;
 
+    }
+    if (S3_F==1)
+    {
+        LED_Sweep_Left();
+        S3_F=0;
+    }
+    
+        if (S6_F==1)
+    {
+        LED_Sweep_Right();
+        S6_F=0;
     }
 
 /*
