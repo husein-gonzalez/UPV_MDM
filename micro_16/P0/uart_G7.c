@@ -11,7 +11,7 @@
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 //================================================================
 // Cálculos de tiempos y baudios
-#define Fosc 80000000 //Frecuencia oscilador CPU
+#define Fosc 8000000 //Frecuencia oscilador CPU
 #define Fcy Fosc/2
 #define BAUDRATE2 9600 // baudios (bits/sg) de transmision
 #define BAUD_RATEREG_2_BRGH1 ((Fcy/BAUDRATE2)/4)-1 // Para BRGH = 1
