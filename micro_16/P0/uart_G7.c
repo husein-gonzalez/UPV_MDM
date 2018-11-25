@@ -67,6 +67,15 @@
 //
 #define clrscr "\x1b[2J" // Borra pantalla 0x1b, '[','2','J'
 #define home "\x1b[H" // Cursor inicio
+
+
+//********************************************************************************
+//  STEP 6:
+//  Allocate two buffers for DMA transfers
+//********************************************************************************/
+unsigned int BufferA[16] __attribute__((space(dma)));
+unsigned int BufferB[16] __attribute__((space(dma)));
+
 //========================================================
 void Inic_RS232_2 (int freq ) //freq = 0 => 8MHz, freq= 1 => 80Mhz
 {
@@ -197,3 +206,99 @@ void __attribute__((interrupt, no_auto_psv)) _U2ErrInterrupt (void)
  Nop();
  _U2EIF = 0;
 } 
+
+
+// Configura UART2 por DMA
+void cfgUart2_DMA(int freq)
+{
+    if(osc_8_80_F==0)
+    {
+        U2MODEbits.STSEL = 0;			// 1-stop bit
+        U2MODEbits.PDSEL = 0;			// No Parity, 8-data bits
+        U2MODEbits.ABAUD = 0;			// Autobaud Disabled
+        
+        _BRGH_U2 = 1; // BRGH 0 / 1
+
+        U2BRG = BAUD_RATEREG_2_BRGH10 ;
+
+        //********************************************************************************
+        //  STEP 1:
+        //  Configure UART for DMA transfers
+        //********************************************************************************/
+        U2STAbits.UTXISEL0 = 0;			// Interrupt after one Tx character is transmitted
+        U2STAbits.UTXISEL1 = 0;			                            
+        U2STAbits.URXISEL  = 0;			// Interrupt after one RX character is received
+
+
+        //********************************************************************************
+        //  STEP 2:
+        //  Enable UART Rx and Tx
+        //********************************************************************************/
+        U2MODEbits.UARTEN   = 1;		// Enable UART
+        U2STAbits.UTXEN     = 1;		// Enable UART Tx
+
+
+        IEC4bits.U2EIE = 0;
+    }
+    
+          
+}
+
+// TX DMA0 configuration
+void cfgDma0UartTx(void)
+{
+	//********************************************************************************
+	//  STEP 3:
+	//  Associate DMA Channel 0 with UART Tx
+	//********************************************************************************/
+	DMA0REQ = 0x001F;					// Select UART2 Transmitter
+	DMA0PAD = (volatile unsigned int) &U2TXREG;
+	
+	//********************************************************************************
+	//  STEP 5:
+	//  Configure DMA Channel 0 to:
+	//  Transfer data from RAM to UART
+	//  One-Shot mode
+	//  Register Indirect with Post-Increment
+	//  Using single buffer
+	//  8 transfers per buffer
+	//  Transfer words
+	//********************************************************************************/
+	//DMA0CON = 0x2001;					// One-Shot, Post-Increment, RAM-to-Peripheral
+	DMA0CONbits.AMODE = 0;
+	DMA0CONbits.MODE  = 1;
+	DMA0CONbits.DIR   = 1;
+	DMA0CONbits.SIZE  = 0;
+	DMA0CNT = 15;						// 16 DMA requests
+
+	//********************************************************************************
+	//  STEP 6:
+	// Associate one buffer with Channel 0 for one-shot operation
+	//********************************************************************************/
+	DMA0STA = __builtin_dmaoffset(BufferA);
+
+	//********************************************************************************
+	//  STEP 8:
+	//	Enable DMA Interrupts
+	//********************************************************************************/
+	IFS0bits.DMA0IF  = 0;			// Clear DMA Interrupt Flag
+	IEC0bits.DMA0IE  = 1;			// Enable DMA interrupt
+    
+    DMA0CONbits.CHEN  = 1;			// enable DMA0 Channel
+
+}
+
+//********************************************************************************
+//  STEP 7:
+//	Setup DMA interrupt handlers
+//	Force transmit after 8 words are received
+//********************************************************************************/
+void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
+{
+	IFS0bits.DMA0IF = 0;			// Clear the DMA0 Interrupt Flag;
+}
+
+//void __attribute__ ((interrupt, no_auto_psv)) _U2ErrInterrupt(void)
+//{
+//	IFS4bits.U2EIF = 0; // Clear the UART2 Error Interrupt Flag
+//}

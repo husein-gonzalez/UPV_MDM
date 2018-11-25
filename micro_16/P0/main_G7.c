@@ -192,6 +192,19 @@ void escribir_UART(char* txtPrintable)
     putRS232_2(0x0A);
 }
 
+void escribir_UART_DMA(char* txtPrintable)
+{
+    int i=0;
+    
+    for(i=0;i<16;i++)
+    {
+        BufferA[i]=txtPrintable[i];
+        //delay_ms(1);
+    }    
+   // putRS232_2(0x0D);
+  //  putRS232_2(0x0A);
+}
+
 void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
 {
 //    char c;
@@ -297,6 +310,7 @@ char osc_freq=0;
 
 SYS_Initialize();
 Inicializacion_variables();
+escribir_UART_DMA(Texto_1);
 
 
         /*
@@ -332,7 +346,9 @@ Inicializacion_variables();
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
-        escribir_UART(Texto_1);
+        //escribir_UART(Texto_1);
+        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+        DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
 

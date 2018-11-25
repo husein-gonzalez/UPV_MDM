@@ -137,6 +137,8 @@ void SYS_Initialize ( void )
     Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
     Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
     Init_LCD();
-    Inic_RS232_2 (osc_8_80_F);
+    //Inic_RS232_2 (osc_8_80_F); // uart por polling, dependiendo de freq osc
+    cfgDma0UartTx();//uart TX por DMAChannel 0
+	cfgUart2_DMA(osc_8_80_F);	//  configuracion UART
 }
 
