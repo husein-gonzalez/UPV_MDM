@@ -288,6 +288,56 @@ void cfgDma0UartTx(void)
 
 }
 
+// DMA1 configuration
+void cfgDma1UartRx(void)
+{
+	//********************************************************************************
+	//  STEP 3:
+	//  Associate DMA Channel 1 with UART Rx
+	//********************************************************************************/
+	DMA1REQ = 0x001E;					// Select UART2 Receiver
+	DMA1PAD = (volatile unsigned int) &U2RXREG;
+
+	//********************************************************************************
+	//  STEP 4:
+	//  Configure DMA Channel 1 to:
+	//  Transfer data from UART to RAM Continuously
+	//  Register Indirect with Post-Increment
+	//  Using two ?ping-pong? buffers
+	//  8 transfers per buffer
+	//  Transfer words
+	//********************************************************************************/
+	//DMA1CON = 0x0002;					// Continuous, Ping-Pong, Post-Inc, Periph-RAM
+	DMA1CONbits.AMODE = 0;
+	DMA1CONbits.MODE  = 2;
+	DMA1CONbits.DIR   = 0;
+	DMA1CONbits.SIZE  = 0;
+	DMA1CNT = 15;						// 8 DMA requests
+
+	//********************************************************************************
+	//  STEP 6:
+	//  Associate two buffers with Channel 1 for ?Ping-Pong? operation
+	//********************************************************************************/
+	DMA1STA = __builtin_dmaoffset(BufferA);
+	DMA1STB = __builtin_dmaoffset(BufferB);
+
+	//********************************************************************************
+	//  STEP 8:
+	//	Enable DMA Interrupts
+	//********************************************************************************/
+	IFS0bits.DMA1IF  = 0;			// Clear DMA interrupt
+	IEC0bits.DMA1IE  = 1;			// Enable DMA interrupt
+
+	//********************************************************************************
+	//  STEP 9:
+	//  Enable DMA Channel 1 to receive UART data
+	//********************************************************************************/
+	DMA1CONbits.CHEN = 1;			// Enable DMA Channel
+}
+
+
+
+
 //********************************************************************************
 //  STEP 7:
 //	Setup DMA interrupt handlers
@@ -297,6 +347,29 @@ void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
 {
 	IFS0bits.DMA0IF = 0;			// Clear the DMA0 Interrupt Flag;
 }
+
+void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
+{
+	static unsigned int BufferCount = 0;  // Keep record of which buffer contains Rx Data
+
+	if(BufferCount == 0)
+	{
+		DMA0STA = __builtin_dmaoffset(BufferA); // Point DMA 0 to data to be transmitted
+	}
+	else
+	{
+		DMA0STA = __builtin_dmaoffset(BufferB); // Point DMA 0 to data to be transmitted
+	}
+
+	DMA0CONbits.CHEN  = 1;			// Re-enable DMA0 Channel
+	DMA0REQbits.FORCE = 1;			// Manual mode: Kick-start the first transfer
+
+	BufferCount ^= 1;				
+	IFS0bits.DMA1IF = 0;			// Clear the DMA1 Interrupt Flag
+}
+
+
+
 
 //void __attribute__ ((interrupt, no_auto_psv)) _U2ErrInterrupt(void)
 //{

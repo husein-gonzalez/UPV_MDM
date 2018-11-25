@@ -347,8 +347,8 @@ escribir_UART_DMA(Texto_1);
         LED_Toggle(LED_D3);
         flag_1s=0;
         //escribir_UART(Texto_1);
-        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+      //  DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+      //  DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
 
