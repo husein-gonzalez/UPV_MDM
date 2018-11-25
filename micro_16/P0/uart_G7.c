@@ -11,15 +11,15 @@
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 //================================================================
 // Cálculos de tiempos y baudios
-#define Fosc0 8000000 //Frecuencia oscilador CPU
-#define Fosc1 80000000 //Frecuencia oscilador CPU
-#define Fcy0 Fosc0/2
+#define Fosc0 8000000 //Frecuencia oscilador CPU 8MHz
+#define Fosc1 80000000 //Frecuencia oscilador CPU 80MHz
+#define Fcy0 Fosc0/2 
 #define Fcy1 Fosc1/2
 #define BAUDRATE2 9600 // baudios (bits/sg) de transmision
-#define BAUD_RATEREG_2_BRGH10 ((Fcy0/BAUDRATE2)/4)-1 // Para BRGH = 1
-#define BAUD_RATEREG_2_BRGH00 ((Fcy0/BAUDRATE2)/16)-1 // Para BRGH = 0
-#define BAUD_RATEREG_2_BRGH11 ((Fcy1/BAUDRATE2)/4)-1 // Para BRGH = 1
-#define BAUD_RATEREG_2_BRGH01 ((Fcy1/BAUDRATE2)/16)-1 // Para BRGH = 0
+#define BAUD_RATEREG_2_BRGH10 ((Fcy0/BAUDRATE2)/4)-1 // Para BRGH = 1, 8MHz
+#define BAUD_RATEREG_2_BRGH00 ((Fcy0/BAUDRATE2)/16)-1 // Para BRGH = 0, 8MHz
+#define BAUD_RATEREG_2_BRGH11 ((Fcy1/BAUDRATE2)/4)-1 // Para BRGH = 1 , 80MHz
+#define BAUD_RATEREG_2_BRGH01 ((Fcy1/BAUDRATE2)/16)-1 // Para BRGH = 0, 80MHz
 //===============================================================
 // Reg/bits UART2 serial port: U2MODE y U2STA no definidos en P24FJ12GA010A.h
 // U2MODE
@@ -71,92 +71,93 @@
 void Inic_RS232_2 (int freq ) //freq = 0 => 8MHz, freq= 1 => 80Mhz
 {
     
-    if(freq==0)
+    if(freq==0) //frecuencia de oscilador = 8MHz
     {
-// No requerido, lo hace el hardware
-// UART2_TX_TRIS = 0;
-// UART2_RX_TRIS = 1;
-// UART2_TX_LAT = 1;
-// UART2_RX_LAT = 1;
-// Inic_DMA_RS232_2 (); //
+    // No requerido, lo hace el hardware
+    // UART2_TX_TRIS = 0;
+    // UART2_RX_TRIS = 1;
+    // UART2_TX_LAT = 1;
+    // UART2_RX_LAT = 1;
+    // Inic_DMA_RS232_2 (); //
 
- U2MODE = 0x00; // 8bits, sin paridad, 1 stop, Uart parada
-// _UARTEN_U2 =; // Habilita UART
-// _USIDL_U2 =; // 0-> continua en modo Idle
-// _IREN_U2 =; // Habilita IrDA
-// _RTSMD_U2 =; // Modo pata U2RTS
-// _UEN_U2 = ; // Habilita U2TX, U2RX, U2CTS y U2RTS
-// _WAKE_U2 =; // Habilita Wake-up al detectar Start en Sleep
-// _LPBACK_U2 =; // Habilita modo Loopback
-// _ABAUD_U2 =; // Habilita Auto-Baud
-// _RXINV_U2 =; // Invierte polaridad para recepción
- _BRGH_U2 = 1; // BRGH 0 / 1
-// _PDSEL_U2 =; // Paridad: 00= 8 bits sin paridad
-// _STSEL_U2 =; // Duración bit Stop
- U2BRG = BAUD_RATEREG_2_BRGH10 ;
- U2STA = 0;
-// _UTXISEL1_U2 =; // Tipo Interrupción Transmisión
-// _UTXINV_U2 =; // Invierte polaridad pata transmisión
-// _UTXISEL0_U2 =; // Tipo Interrupción Transmisión
-// _UTXBRK_U2 =; // Bit Breal
-// _UTXEN_U2 =; // Habilita Transmisión
-// _UTXBF_U2 =; // Estado Buffer transmisión (solo lectura)
-// _TRMT_U2 =; // Estado Reg.Desplazamiento (solo lectura)
-// _URXISEL_U2 =; // Tipo interrupción en recepción
- // 0x= interrupción con cada dato que llega
- // 10= interrupción a 3/4 del buffer
- // 11= interrupción cuando buffer lleno
-// _ADDEN_U2 =; // Detección bit de dirección en 9 bits
-// _RIDLE_U2 =; // Estado de la recepción (solo lectura)
-// _PERR_U2 =; // Error de paridad /solo lectura)
-// _FERR_U2 =; // Error de trama (solo lectura)
-// _OERR_U2 =; // Error ocerrun (borrable/ solo lectura)
-// _URXDA_U2 =; // 0=buffer vacío, 1= al menos un dato
- _U2TXIP =4; // Prioridad en recepción
- _U2RXIP = 4; // Prioridad en recepción
- _U2RXIF = 0; // Borra flag int. RX
- _U2TXIF = 0; // Borra flag int. TX
- _U2EIF = 0; // Boorra flag de Error UART
- _U2TXIE = 0; // Habilita int. de transmisión
- _U2RXIE = 0;
- _U2EIE = 0; // Habilita Int_ de Error UART 
-  _OERR_U2=0; // Según versión corrige bugg
- _UARTEN_U2 = 1; // Habilita la UART_2
- _UTXEN_U2 = 1; //Habilita transmisión, Debe activarse despues habilitar UART
-Nop();
-Nop();
-Nop();
-// ESCRIBE UNA FUNCION que ESPERA LA DURACION DE UN BIT ANTES DE
-// empezar a transmitir
- //U2TXREG = 0; // Transmite caracter 0x00 (nulo))
+     U2MODE = 0x00; // 8bits, sin paridad, 1 stop, Uart parada
+    // _UARTEN_U2 =; // Habilita UART
+    // _USIDL_U2 =; // 0-> continua en modo Idle
+    // _IREN_U2 =; // Habilita IrDA
+    // _RTSMD_U2 =; // Modo pata U2RTS
+    // _UEN_U2 = ; // Habilita U2TX, U2RX, U2CTS y U2RTS
+    // _WAKE_U2 =; // Habilita Wake-up al detectar Start en Sleep
+    // _LPBACK_U2 =; // Habilita modo Loopback
+    // _ABAUD_U2 =; // Habilita Auto-Baud
+    // _RXINV_U2 =; // Invierte polaridad para recepción
+     _BRGH_U2 = 1; // BRGH 0 / 1
+    // _PDSEL_U2 =; // Paridad: 00= 8 bits sin paridad
+    // _STSEL_U2 =; // Duración bit Stop
+     U2BRG = BAUD_RATEREG_2_BRGH10 ;
+     U2STA = 0;
+    // _UTXISEL1_U2 =; // Tipo Interrupción Transmisión
+    // _UTXINV_U2 =; // Invierte polaridad pata transmisión
+    // _UTXISEL0_U2 =; // Tipo Interrupción Transmisión
+    // _UTXBRK_U2 =; // Bit Breal
+    // _UTXEN_U2 =; // Habilita Transmisión
+    // _UTXBF_U2 =; // Estado Buffer transmisión (solo lectura)
+    // _TRMT_U2 =; // Estado Reg.Desplazamiento (solo lectura)
+    // _URXISEL_U2 =; // Tipo interrupción en recepción
+     // 0x= interrupción con cada dato que llega
+     // 10= interrupción a 3/4 del buffer
+     // 11= interrupción cuando buffer lleno
+    // _ADDEN_U2 =; // Detección bit de dirección en 9 bits
+    // _RIDLE_U2 =; // Estado de la recepción (solo lectura)
+    // _PERR_U2 =; // Error de paridad /solo lectura)
+    // _FERR_U2 =; // Error de trama (solo lectura)
+    // _OERR_U2 =; // Error ocerrun (borrable/ solo lectura)
+    // _URXDA_U2 =; // 0=buffer vacío, 1= al menos un dato
+     _U2TXIP =4; // Prioridad en recepción
+     _U2RXIP = 4; // Prioridad en recepción
+     _U2RXIF = 0; // Borra flag int. RX
+     _U2TXIF = 0; // Borra flag int. TX
+     _U2EIF = 0; // Boorra flag de Error UART
+     _U2TXIE = 0; // Habilita int. de transmisión
+     _U2RXIE = 0;
+     _U2EIE = 0; // Habilita Int_ de Error UART 
+      _OERR_U2=0; // Según versión corrige bugg
+     _UARTEN_U2 = 1; // Habilita la UART_2
+     _UTXEN_U2 = 1; //Habilita transmisión, Debe activarse despues habilitar UART
+    Nop();
+    Nop();
+    Nop();
+    // ESCRIBE UNA FUNCION que ESPERA LA DURACION DE UN BIT ANTES DE
+    // empezar a transmitir
+     //U2TXREG = 0; // Transmite caracter 0x00 (nulo))
 
- //DMA0CONbits.CHEN = 1; //Inicia DMA
-    }
+     //DMA0CONbits.CHEN = 1; //Inicia DMA
+        }
     
-    else
+    else //frecuencia de oscilador = 80MHz
     {
-       U2MODE = 0x00; // 8bits, sin paridad, 1 stop, Uart parada
-
- _BRGH_U2 = 1; // BRGH 0 / 1
- U2BRG = BAUD_RATEREG_2_BRGH11 ;
- U2STA = 0;
- _U2TXIP =4; // Prioridad en recepción
- _U2RXIP = 4; // Prioridad en recepción
- _U2RXIF = 0; // Borra flag int. RX
- _U2TXIF = 0; // Borra flag int. TX
- _U2EIF = 0; // Boorra flag de Error UART
- _U2TXIE = 0; // Habilita int. de transmisión
- _U2RXIE = 0;
- _U2EIE = 0; // Habilita Int_ de Error UART 
-  _OERR_U2=0; // Según versión corrige bugg
- _UARTEN_U2 = 1; // Habilita la UART_2
- _UTXEN_U2 = 1; //Habilita transmisión, Debe activarse despues habilitar UART
-Nop();
-Nop();
-Nop();
+        U2MODE = 0x00; // 8bits, sin paridad, 1 stop, Uart parada
+        _BRGH_U2 = 1; // BRGH 0 / 1
+        U2BRG = BAUD_RATEREG_2_BRGH11 ;
+        U2STA = 0;
+        _U2TXIP =4; // Prioridad en recepción
+        _U2RXIP = 4; // Prioridad en recepción
+        _U2RXIF = 0; // Borra flag int. RX
+        _U2TXIF = 0; // Borra flag int. TX
+        _U2EIF = 0; // Boorra flag de Error UART
+        _U2TXIE = 0; // Habilita int. de transmisión
+        _U2RXIE = 0;
+        _U2EIE = 0; // Habilita Int_ de Error UART 
+         _OERR_U2=0; // Según versión corrige bugg
+        _UARTEN_U2 = 1; // Habilita la UART_2
+        _UTXEN_U2 = 1; //Habilita transmisión, Debe activarse despues habilitar UART
+       Nop();
+       Nop();
+       Nop();
  
     }
 } // FIN: Inic_RS232_2
+
+
 //========= ENCUESTRA ====================================
 void putRS232_2( char c) // Envía por encuesta un caracter
 {
@@ -165,12 +166,15 @@ void putRS232_2( char c) // Envía por encuesta un caracter
   U2TXREG = c; // Carga dato a transmitir
 // return c;
 } // FINputRS232_2
+
 // Espera a recibir un caracter por la UART2
 char getRS232_2( void)
 {
  while ( !_URXDA_U2); // Espera a que llegue un dato
  return U2RXREG; // recoge el dato
 } // FIN getRS232_2 
+
+
 
 // ====== Servicio INTERRUPCION TRANSMISION RS232_2 ==============
 // Trasmite un dato, si hay, al final de transmisión del anterior
@@ -179,12 +183,14 @@ void _ISR_NO_PSV _U2TXInterrupt(void)
 // ? = 'H'; // Envía dato 'H'
  _U2TXIF = 0;
 } // FIN _U2RXInterruptt
+
 // Recoge el dato recibido byte a byte
 void _ISR_NO_PSV _U2RXInterrupt ( void)
 {
 // ?????
  _U2RXIF = 0;
 } // FIN _U2RXInterruptt
+
 void __attribute__((interrupt, no_auto_psv)) _U2ErrInterrupt (void)
 {
  Nop();

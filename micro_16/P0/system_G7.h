@@ -32,7 +32,7 @@ extern "C" {
  
  void toggle_osc_8_80(void);   
  
- extern int osc_8_80_F;
+ extern int osc_8_80_F; // indica la freq del oscilador: 0=> osc = 8MHz, 1=> 80MHz
     
 
 

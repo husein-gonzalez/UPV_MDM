@@ -26,15 +26,29 @@ extern void SYS_Initialize ( void ) ;
 int Str_i, Str_j;
 int EscrituraLCD;
 int columnaLCD;
+int cont_5s = 0;
+int avance_display=0;
+int filas;
 
-char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
-                         "=== Pulsa S3 ==="    // 16 caracteres línea 2 
-                         "Freq =          " }; // 16 caracteres línea 3, rellenar con info de oscilador 
+//const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+//                         "=== Pulsa S3 ==="};    // 16 caracteres línea 2 
+//const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+unsigned char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+                         "=== prueba   ==="
+                         "=== de scroll==="
+                         "=== fila 4   ==="
+                         "=== fila 5   ==="
+                         "=== fila 6   ==="
+                         "=== fila 7   ==="};    // 16 caracteres línea 2 
+
+
 
 enum{
+    INICIO,
     DATO,
     FILA1,
-    FILA2
+    FILA2,
+    EVALUA
 };
 
 
@@ -43,8 +57,56 @@ void Inicializacion_variables(void)
 
     Str_i = 0;
     Str_j = 0;
-    EscrituraLCD = DATO;
+    EscrituraLCD = INICIO;
     columnaLCD = 0;
+}
+
+//=== Pasa un texto de FLASH a RAM y 
+//void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
+//{ 
+//unsigned char i, j; 
+//j= 0; 
+//for(i=0; i<16; i++, j++) 
+//      {      
+//        Ventana_DATOS[0][i] = texto[j] ; 
+//      }      
+//      for(i=0;i<16;i++,j++)      
+//      {      
+//        Ventana_DATOS[1][i] = texto[j] ; 
+//      }      
+//} //FIN Mensaje_FLASH_Ventana_DATOS
+
+
+//=== Pasa un texto de FLASH a RAM y 
+void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance) 
+{ 
+//unsigned char i, j; 
+unsigned char i; 
+int j;
+j= avance * 16;
+
+      for(i=0; i<16; i++, j++) 
+      {      
+        Ventana_DATOS[0][i] = texto[j] ; 
+      }      
+      for(i=0;i<16;i++,j++)      
+      {      
+        Ventana_DATOS[1][i] = texto[j] ; 
+      }   
+    Nop();
+    Nop();
+} //FIN Mensaje_FLASH_Ventana_DATOS
+
+
+
+
+void avanzarPantalla (void)
+{
+
+   // Mensaje_FLASH_Ventana_DATOS_mejorado(Texto_1,avance_display);
+//    avance_display++;
+//    EscrituraLCD = DATO;
+
 }
 
 
@@ -130,34 +192,42 @@ void escribir_UART(char* txtPrintable)
     putRS232_2(0x0A);
 }
 
-
-
-
-void EnvioDatosLCD(char* txtPrintable)
+void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
 {
-    char c;
+//    char c;
+    
     
     if (milis_F2)
     {     
 
-        char c;
+//        char c;
         switch(EscrituraLCD)
         {
             
-            case DATO:
-                Mensaje_FLASH_Ventana_DATOS(txtPrintable);
-                EscrituraLCD = FILA1;
+            case INICIO:
+                filas = 1;
+                columnaLCD =0;  
+                avance_display = 0;
+                EscrituraLCD = DATO;
+            case DATO:               
+                Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,avance_display);                  
                 lcd_cmd(0x01);
                 delay_ms(5);
                 lcd_cmd(0x02);
                 delay_ms(5);
+                lcd_cmd(0x80);
+                delay_ms(5);
+                EscrituraLCD = FILA1;
             case FILA1:
-               // c=lcd_data(Ventana_DATOS[0][columnaLCD]);
-                    c=lcd_data(Ventana_DATOS[0][columnaLCD]);
+                    lcd_data(Ventana_DATOS[0][columnaLCD]);
                     columnaLCD++;
                     if (columnaLCD ==16)//fixme usar define                        
                     {
-                        columnaLCD =0;
+                        columnaLCD =0;                                               
+                        lcd_cmd(0x01);
+                        delay_ms(5);
+                        lcd_cmd(0xC0);
+                        delay_ms(5);
                         EscrituraLCD = FILA2;
                         //lcd_cmd(0xC0);
                         //delay_ms(5);
@@ -172,14 +242,32 @@ void EnvioDatosLCD(char* txtPrintable)
                     //c=lcd_data(Ventana_DATOS[1][columnaLCD]);
                     if (columnaLCD < 16)//fixme usar define                        
                     {
-                        c=lcd_data(Ventana_DATOS[1][columnaLCD]);
+                        lcd_data(Ventana_DATOS[1][columnaLCD]);
                         columnaLCD++;
                        // columnaLCD =0;
                         //EscrituraLCD = FILA2;
                     }    
                     else
-                        Nop();
-            break;    
+                    {
+                       EscrituraLCD = EVALUA;                                      
+                    }
+            break;                    
+            case EVALUA:
+                    delay_ms(1000);                 
+                    if(filas < n_lineas-1)
+                    {
+                        filas++;
+                        EscrituraLCD = DATO;
+                        columnaLCD =0;  
+                        avance_display++;
+                    }
+                    else
+                    {
+                        EscrituraLCD = INICIO;
+
+                    }
+                break;
+           
         }
         
         
@@ -233,7 +321,7 @@ Inicializacion_variables();
     delay_ms(5);
     tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
 
-    EnvioDatosLCD(Texto_1);
+    EnvioDatosLCD(Texto_1, 7);
 
     //escribelcd();
     //FIXME: sacar tiempo transcurrido por LCD o UART
@@ -245,7 +333,7 @@ Inicializacion_variables();
         LED_Toggle(LED_D3);
         flag_1s=0;
         escribir_UART(Texto_1);
-
+	cont_5s++;
 
 
 

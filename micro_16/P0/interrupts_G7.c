@@ -1,4 +1,4 @@
-
+#include "p24HJ256GP610A.h"
 #include "system_G7.h"
 #include "interrupts_G7.h"
 

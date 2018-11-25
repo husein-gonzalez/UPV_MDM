@@ -64,7 +64,7 @@
 // Estas PRAGMA se ejecutan al grabar el programa
 
 //===========================================================================
-int osc_8_80_F = 0; // 0=> osc = 8MHz, 1=> 80MHz
+int osc_8_80_F = 0; // indica la freq del oscilador: 0=> osc = 8MHz, 1=> 80MHz
 
 void Inic_Oscilador_80 (void)
 {
