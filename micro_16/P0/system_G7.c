@@ -139,7 +139,7 @@ void SYS_Initialize ( void )
     Init_LCD();
     //Inic_RS232_2 (osc_8_80_F); // uart por polling, dependiendo de freq osc
     cfgDma0UartTx();//uart TX por DMAChannel 0
-    cfgDma1UartRx();
+ //   cfgDma1UartRx();
 	cfgUart2_DMA(osc_8_80_F);	//  configuracion UART
 }
 

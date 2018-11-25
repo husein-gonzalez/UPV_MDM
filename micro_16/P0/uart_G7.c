@@ -348,25 +348,25 @@ void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
 	IFS0bits.DMA0IF = 0;			// Clear the DMA0 Interrupt Flag;
 }
 
-void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
-{
-	static unsigned int BufferCount = 0;  // Keep record of which buffer contains Rx Data
-
-	if(BufferCount == 0)
-	{
-		DMA0STA = __builtin_dmaoffset(BufferA); // Point DMA 0 to data to be transmitted
-	}
-	else
-	{
-		DMA0STA = __builtin_dmaoffset(BufferB); // Point DMA 0 to data to be transmitted
-	}
-
-	DMA0CONbits.CHEN  = 1;			// Re-enable DMA0 Channel
-	DMA0REQbits.FORCE = 1;			// Manual mode: Kick-start the first transfer
-
-	BufferCount ^= 1;				
-	IFS0bits.DMA1IF = 0;			// Clear the DMA1 Interrupt Flag
-}
+//void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
+//{
+//	static unsigned int BufferCount = 0;  // Keep record of which buffer contains Rx Data
+//
+//	if(BufferCount == 0)
+//	{
+//		DMA0STA = __builtin_dmaoffset(BufferA); // Point DMA 0 to data to be transmitted
+//	}
+//	else
+//	{
+//		DMA0STA = __builtin_dmaoffset(BufferB); // Point DMA 0 to data to be transmitted
+//	}
+//
+//	DMA0CONbits.CHEN  = 1;			// Re-enable DMA0 Channel
+//	DMA0REQbits.FORCE = 1;			// Manual mode: Kick-start the first transfer
+//
+//	BufferCount ^= 1;				
+//	IFS0bits.DMA1IF = 0;			// Clear the DMA1 Interrupt Flag
+//}
 
 
 
