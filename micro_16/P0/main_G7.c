@@ -22,7 +22,7 @@ Descripci?n:
 #include "interrupts_G7.h"
 
 #define ROWS 8
-#define COLUMNS 16
+#define COLUMNS 14
 
 
 extern void SYS_Initialize ( void ) ;
@@ -34,16 +34,17 @@ int avance_display=0;
 int filas;
 
  
-char *Texto_1[] ={"=== MISE G7 ====",     // 16 caracteres l√≠nea 1 
-                             "===   OSC    ===",
-                             "===  TEMP    ===",
-                             "=== POTENC   ===",
-                             "=== XY JOYST ===",
-                             "=== PC INP   ===",
-                             "== 32b TIM   ===",
-                             "=== % CPU    ==="};    // 16 caracteres l√≠nea 2 
+char *Texto_1[] ={"==== MISE G7====",     // 16 caracteres l√≠nea 1 
+                  "===   OSC    ===",
+                  "===  TEMP    ===",
+                  "=== POTENC   ===",
+                  "=== XY JOYST ===",
+                  "=== PC INP   ===",
+                  "=== 32b TIM  ===",
+                  "=== % CPU    ==="};    // 16 caracteres l√≠nea 2 
 
-
+char borra_pantalla[]= {"\x1b[2J"}; // Borra pantalla 0x1b, '[','2','J'
+char cursor_inicio[]= {"\x1b[H"};// Cursor inicio
 
 enum{
     INICIO,
@@ -110,8 +111,6 @@ void avanzarPantalla (void)
 //    EscrituraLCD = DATO;
 
 }
-
-
 
 /*
 uint8_t valor = 0x35;
@@ -196,21 +195,47 @@ void escribir_UART(char* txtPrintable)
 
 void escribir_UART_DMA(char **txtPrintable)
 {
-    int i=0,j=0;
+    int i=0,j=0,k=0,l=0;
+    
+    
+
+        for(l=0;l<6;l++)
+        {
+          BufferA[l]=borra_pantalla[l];
+        }
+        delay_ms(5);
+        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
+        DMA0REQbits.FORCE = 1;			// forzar transmision
+        delay_ms(5);
+        
+        for(k=0;k<5;k++)
+        {
+          BufferA[k]=cursor_inicio[k];
+        }
+        delay_ms(5);
+        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
+        DMA0REQbits.FORCE = 1;			// forzar transmision
+        delay_ms(5);
+    
+
+    
     
     for(j=0;j<ROWS;j++)
-    {
+    {        
         for(i=0;i<COLUMNS;i++)
         {
             BufferA[i]=txtPrintable[j][i];
-            //delay_ms(1);
+            delay_ms(50);
         } 
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+ //       DMA0REQbits.FORCE = 1;			// forzar transmision
+        delay_ms(50);
         BufferA[0]=0x0D;
         BufferA[1]=0x0A;
+        delay_ms(50);
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
         DMA0REQbits.FORCE = 1;			// forzar transmision
+        delay_ms(50);
         
     }
    // putRS232_2(0x0D);
@@ -358,10 +383,10 @@ escribir_UART_DMA(Texto_1);
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
-      //  escribir_UART_DMA(Texto_1);
-        //escribir_UART(Texto_1);
-        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+        escribir_UART_DMA(Texto_1);
+       // escribir_UART(Texto_1);
+       // DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
+     //   DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
 
