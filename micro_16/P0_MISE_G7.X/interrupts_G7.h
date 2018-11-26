@@ -14,7 +14,9 @@ extern "C" {
 
 
     
-    extern int contador_1ms, flag_1s;
+extern int contador_1ms,flag_1s, S3_F ,S4_F, S6_F;
+    
+void configura_CN_int(void);
 
 
 #ifdef	__cplusplus

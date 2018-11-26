@@ -13,7 +13,7 @@ v2.0 Fecha: 15-X-2018
 #include "p24HJ256GP610A.h"
 //#include "Explorer16_G7_MISE_v0.h"
 //#include "Timers_G7_MISE_v0.h"
-#include "system_G7.h"
+#include "timers_G7.h"
 
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 #define Timer_X 1 // Timer 16 bits a utilizar

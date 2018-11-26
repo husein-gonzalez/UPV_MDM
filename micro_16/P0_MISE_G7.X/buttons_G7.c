@@ -2,18 +2,13 @@
 
 #include "p24HJ256GP610A.h"
 #include "buttons_G7.h"
-#include "system_G7.h"
-
-
-/*** Button Definitions *********************************************/
-//      S1  is MCLR button
+//#include "system_G7.h"
 
 
 
 
 
-
-void Inic_Pulsadores ()// Inicializa pulsadores  S3,S4,S5,S6 como salida
+void Inic_Pulsadores ()// Inicializa pulsadores  S3,S4,S5,S6 como entrada
 
 {
 
