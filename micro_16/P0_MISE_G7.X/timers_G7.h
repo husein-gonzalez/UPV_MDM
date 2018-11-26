@@ -12,16 +12,19 @@
 extern "C" {
 #endif
 
-//cabeceras
+
     
-    #include "system_G7.h"
+#include "system_G7.h"
+#include "stdint.h"
+    
+//cabeceras
 
     extern int milis_F;
     extern int milis_F2;
     extern uint64_t t67_contador;
     void Inic_Timer_X (unsigned char timer, unsigned char unidades, unsigned int tiempo);
     void delay_ms (int milis); //milisegundos
-
+    uint64_t time_diff(int opcion);
 #ifdef	__cplusplus
 }
 #endif

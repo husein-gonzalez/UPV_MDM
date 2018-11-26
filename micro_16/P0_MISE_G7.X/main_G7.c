@@ -15,25 +15,40 @@ Descripci?n:
 #include "p24HJ256GP610A.h"
 //#include "Explorer16_G7_MISE_v0.h"
 //#include "IO_G7_MISE_v0.h"
-#include "leds_G7.h"
-#include "lcd_G7.h"
-#include "buttons_G7.h"
+//#include "leds_G7.h"
+//#include "lcd_G7.h"
+//#include "buttons_G7.h"
 #include "system_G7.h"
-#include "interrupts_G7.h"
+//#include "interrupts_G7.h"
 
 
 extern void SYS_Initialize ( void ) ;
 int Str_i, Str_j;
 int EscrituraLCD;
 int columnaLCD;
+int cont_5s = 0;
+int avance_display=0;
+int filas;
 
-const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
-                         "=== Pulsa S3 ==="};    // 16 caracteres línea 2 
+//const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+//                         "=== Pulsa S3 ==="};    // 16 caracteres línea 2 
+//const char Texto_1[ ] = {"=== MISE G7 ===="     // 16 caracteres línea 1 
+unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1 
+                            "Medida 1:___"
+                            "Medida 2:___"
+                            "Medida 3:___"
+                            "Medida 4:___"
+                            "Medida 5:___"
+                            "Medida 6:___"};    // 16 caracteres línea 2 
+
+
 
 enum{
+    INICIO,
     DATO,
     FILA1,
-    FILA2
+    FILA2,
+    EVALUA
 };
 
 
@@ -42,22 +57,60 @@ void Inicializacion_variables(void)
 
     Str_i = 0;
     Str_j = 0;
-    EscrituraLCD = DATO;
+    EscrituraLCD = INICIO;
     columnaLCD = 0;
 }
 
+//=== Pasa un texto de FLASH a RAM y 
+//void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
+//{ 
+//unsigned char i, j; 
+//j= 0; 
+//for(i=0; i<16; i++, j++) 
+//      {      
+//        Ventana_DATOS[0][i] = texto[j] ; 
+//      }      
+//      for(i=0;i<16;i++,j++)      
+//      {      
+//        Ventana_DATOS[1][i] = texto[j] ; 
+//      }      
+//} //FIN Mensaje_FLASH_Ventana_DATOS
 
-void configura_CN_int(void)
+
+//=== Pasa un texto de FLASH a RAM y 
+void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance) 
+{ 
+//unsigned char i, j; 
+unsigned char i; 
+int j;
+j= avance * long_linea_txt;
+
+      for(i=0; i<long_linea_txt; i++, j++) 
+      {      
+        Ventana_DATOS[0][i] = texto[j] ; 
+      }      
+      for(i=0;i<long_linea_txt;i++,j++)      
+      {      
+        Ventana_DATOS[1][i] = texto[j] ; 
+      }   
+    Nop();
+    Nop();
+} //FIN Mensaje_FLASH_Ventana_DATOS
+
+
+
+
+void avanzarPantalla (void)
 {
-    
-    _CNIP=4;
-    _CNIF=0;
-    IE_PULSADOR_S4=1;
-    _CNIE=1;
-    
-       
-    
+
+   // Mensaje_FLASH_Ventana_DATOS_mejorado(Texto_1,avance_display);
+//    avance_display++;
+//    EscrituraLCD = DATO;
+
 }
+
+
+
 /*
 uint8_t valor = 0x35;
 
@@ -93,37 +146,101 @@ for(i=0; i<16; i++, j++)
       }      
 } //FIN Mensaje_FLASH_Ventana_DATOS
 
-
-
-void EnvioDatosLCD(char* txtPrintable)
+void escribir_UART(char* txtPrintable)
 {
-    char c;
+    int i=0;
+    
+    for(i=0;i<16;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
+    
+        for(i=16;i<32;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }    
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
+    
+    for(i=32;i<48;i++)
+    {
+        putRS232_2(txtPrintable[i]);
+        delay_ms(1);
+    }    
+    
+    putRS232_2(0x0D);
+    putRS232_2(0x0A);
+}
+
+void escribir_UART_DMA(char* txtPrintable)
+{
+    int i=0;
+    
+    for(i=0;i<16;i++)
+    {
+        BufferA[i]=txtPrintable[i];
+        //delay_ms(1);
+    }    
+   // putRS232_2(0x0D);
+  //  putRS232_2(0x0A);
+}
+
+void EnvioDatosLCD(unsigned char* txtPrintable)
+{
+//    char c;
+    
     
     if (milis_F2)
     {     
 
-        char c;
+        char c= "1";
         switch(EscrituraLCD)
         {
             
-            case DATO:
-                Mensaje_FLASH_Ventana_DATOS(txtPrintable);
-                EscrituraLCD = FILA1;
+            case INICIO:
+                filas = 1;
+                columnaLCD =0;  
+                avance_display = 0;
+                EscrituraLCD = DATO;
+            case DATO:               
+                Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,avance_display);                  
                 lcd_cmd(0x01);
                 delay_ms(5);
                 lcd_cmd(0x02);
                 delay_ms(5);
+                lcd_cmd(0x80);
+                delay_ms(5);
+                EscrituraLCD = FILA1;
             case FILA1:
-               // c=lcd_data(Ventana_DATOS[0][columnaLCD]);
-                    c=lcd_data(Ventana_DATOS[0][columnaLCD]);
+                if(columnaLCD <= long_linea_txt)
+                {
+                    lcd_data(Ventana_DATOS[0][columnaLCD]);
                     columnaLCD++;
-                    if (columnaLCD ==16)//fixme usar define                        
+                }
+                else 
+                {
+                    if(columnaLCD <=long_linea)
                     {
-                        columnaLCD =0;
-                        EscrituraLCD = FILA2;
-                        //lcd_cmd(0xC0);
-                        //delay_ms(5);
+                        lcd_data(c);
+                        columnaLCD++;
                     }
+                    else
+                    {
+                        columnaLCD =0;     
+                        c = "2";
+//                        lcd_cmd(0x01);
+//                        delay_ms(5);
+                        lcd_cmd(0xC0);
+                        delay_ms(5);
+                        EscrituraLCD = FILA2;
+                    }
+                }                                                                           
             break;
             case FILA2:
                     if(columnaLCD==0)
@@ -132,16 +249,38 @@ void EnvioDatosLCD(char* txtPrintable)
                         delay_ms(1);
                     }
                     //c=lcd_data(Ventana_DATOS[1][columnaLCD]);
-                    if (columnaLCD < 16)//fixme usar define                        
+                    if (columnaLCD <= long_linea_txt)//fixme usar define                        
                     {
-                        c=lcd_data(Ventana_DATOS[1][columnaLCD]);
+                        lcd_data(Ventana_DATOS[1][columnaLCD]);                        
                         columnaLCD++;
-                       // columnaLCD =0;
-                        //EscrituraLCD = FILA2;
                     }    
                     else
-                        Nop();
-            break;    
+                    {
+                        if (columnaLCD <= long_linea)
+                        {
+                         lcd_data(c);                        
+                         columnaLCD++;
+                        }
+                        else
+                       EscrituraLCD = EVALUA;                                      
+                    }
+            break;                    
+            case EVALUA:
+//                    delay_ms(1000);                 
+//                    if(filas < n_lineas-1)
+//                    {
+//                        filas++;
+//                        EscrituraLCD = DATO;
+//                        columnaLCD =0;  
+//                       // avance_display++;
+//                    }
+//                    else
+//                    {
+//                        EscrituraLCD = INICIO;
+//
+//                    }
+                break;
+           
         }
         
         
@@ -164,12 +303,14 @@ int main(void)
 Nop();
 Nop();
 
-char caracter='a';
+//char caracter='a';
+char osc_freq=0;
 
 // Inicializaciones 
 
 SYS_Initialize();
 Inicializacion_variables();
+escribir_UART_DMA(Texto_1);
 
 
         /*
@@ -205,7 +346,11 @@ Inicializacion_variables();
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
-        putRS232_2(caracter);
+        //escribir_UART(Texto_1);
+      //  DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+      //  DMA0REQbits.FORCE = 1;			// forzar transmision
+	cont_5s++;
+
 
 
     //    if(caracter<0x7a)
@@ -216,6 +361,39 @@ Inicializacion_variables();
     //    else
     //        caracter=0x41;
 
+    }
+    if (S3_F==1)
+    {
+        S3_F=0;
+        LED_Sweep_Left();
+        toggle_osc_8_80();        
+        osc_freq=OSCCONbits.COSC;        
+        Texto_1[40]= osc_freq;                
+    }
+    
+        if (S6_F==1)
+    {
+        S6_F=0;
+        LED_Sweep_Right();
+        
+    }
+    if(S4_F==1)
+    {
+    
+                    if(filas < num_lineas_txt-1)
+                    {
+                        filas++;
+                        EscrituraLCD = DATO;
+                        columnaLCD =0;  
+                        avance_display++;
+                    }
+                    else
+                    {
+                        avance_display=0;
+                        EscrituraLCD = INICIO;
+                        //filas =0;
+                    }
+                    S4_F=0;
     }
 
 /*

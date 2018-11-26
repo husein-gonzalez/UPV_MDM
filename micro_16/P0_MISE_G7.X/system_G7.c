@@ -12,6 +12,10 @@
 #include "system_G7.h"
 
 /*
+* Programa el PLL para la frecuencia del Oscilador Principal a 80MHz
+*/
+
+/*
 **	Oscillator Mode: Register FOSCSEL
 **     FNOSC_FRC            Internal Fast RC (FRC)
 **     FNOSC_FRCPLL         Internal Fast RC (FRC) con PLL
@@ -48,7 +52,16 @@
 
 //=========================================================================
 // 
-
+// FOSCSEL
+//#pragma config FNOSC = PRIPLL  	// Oscillator Primario (XT, HS, EC) con PPL
+#pragma config FNOSC = PRI  	// Oscillator Primario (XT, HS, EC) 
+// FOSC
+#pragma config FCKSM = CSECMD   // Only clock switching enabled
+#pragma config POSCMD = XT      // XT oscillator 
+#pragma config OSCIOFNC = OFF   // OSC2 is clock O/P
+// FWDT
+#pragma config FWDTEN = OFF     // Watchdog Timer: Disabled
+// Estas PRAGMA se ejecutan al grabar el programa
 //#pragma config FNOSC = PRIPLL  	// Oscillator Primario (XT, HS, EC) con PPL  FIXME : posiblemente MAL!
 //#pragma config FCKSM = CSECMD   // Only clock switching enabled
 //#pragma config OSCIOFNC = OFF   // OSC2 is clock O/P
@@ -57,7 +70,9 @@
 // Estas PRAGMA se ejecutan al grabar el programa
 
 //===========================================================================
-void Inic_Oscilador (void)
+int osc_8_80_F = 0; // indica la freq del oscilador: 0=> osc = 8MHz, 1=> 80MHz
+
+void Inic_Oscilador_80 (void)
 {
 	RCONbits.SWDTEN = 0;	// Disable Watch Dog Timer (No tiene que ver con Oscilador)
 
@@ -83,8 +98,39 @@ void Inic_Oscilador (void)
 
 // Wait for PLL to lock
 	while(OSCCONbits.LOCK !=1) {}
-}   // === Fin Inic_Oscilador ===
+    osc_8_80_F = 1;
+}   // === Fin Inic_Oscilador_80 ===
 
+
+void Inic_Oscilador_8 (void)
+{
+	//RCONbits.SWDTEN = 0;	// Disable Watch Dog Timer (No tiene que ver con Oscilador)
+
+	__builtin_write_OSCCONH(0x02);		// Initiate Clock Switch to Primary
+										// Oscillator  (NOSC=0b010)
+	__builtin_write_OSCCONL(0x01);		// Start clock switching
+	while (OSCCONbits.COSC != 0b010);	// Wait fot Clock switch to occur
+
+// Wait for PLL to lock
+	//while(OSCCONbits.LOCK !=1) {}
+    osc_8_80_F = 0;
+}   // === Fin Inic_Oscilador_8 ===
+
+
+ void toggle_osc_8_80(void)
+ {
+     osc_8_80_F ^= 1;
+     
+     if (osc_8_80_F == 1)
+     {
+         Inic_Oscilador_80();
+     }
+     else
+         Inic_Oscilador_8();
+     
+     Inic_RS232_2 (osc_8_80_F);
+     
+ }
 
 
 void SYS_Initialize ( void )
@@ -97,6 +143,9 @@ void SYS_Initialize ( void )
     Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
     Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
     Init_LCD();
-    Inic_RS232_2 ();
+    //Inic_RS232_2 (osc_8_80_F); // uart por polling, dependiendo de freq osc
+    cfgDma0UartTx();//uart TX por DMAChannel 0
+    cfgDma1UartRx();
+	cfgUart2_DMA(osc_8_80_F);	//  configuracion UART
 }
 
