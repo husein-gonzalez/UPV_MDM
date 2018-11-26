@@ -1,7 +1,7 @@
 
 #include "p24HJ256GP610A.h"
-//#include "Explorer16_G7_MISE_v0.h"
-#include "system_G7.h"
+
+
 #include "lcd_G7.h"
 
 
@@ -9,24 +9,23 @@
 
 
 
-unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
+unsigned char Ventana_DATOS [num_lineas][long_linea_txt] __attribute__((space(dma)));             
 
 
 
 //========= Envio de COMANDO =========
 void lcd_cmd( char cmd ) //
 {
- RW = 0; // ensure RW is 0
- RS = 0;
  DATA &= 0xFF00; // prepare RD0 - RD7
  DATA |= cmd; // command byte to lcd
+ RW = 0;
+ RS = 0;
  E = 1; // toggle E line
  Nop();
  Nop();
  Nop();
- Nop();
- //- - - CALCULA CUANTOS NOPs SON NECESARIOS - - -
- Nop();
+
+ E = 0;
  E = 0;
  RW = 1;
 }
@@ -43,17 +42,9 @@ void lcd_data( char data ) //
  Nop();
  Nop();
  Nop();
- Nop();
- Nop();
- Nop();
- Nop();
- Nop();
- Nop();
- Nop();
-// - - - CALCULA CUANTOS NOPs SON NECESARIOS - - -
- Nop();
  E = 0; // toggle E signal
- RW = 1;
+ RS = 0; //
+
 } 
 
 
@@ -93,9 +84,11 @@ void Init_LCD (void )
 }
 //======= Interrupción LCD ===============
 //#define _LCD_Interrpt _T1Interrupt
+/* //susana hacer interrupcion aqui??
 void _ISR_NO_PSV _LCD_Interrpt (void) //
 {
  //Escribe un programa (máquina de estados) que envíe un dato o comando cada vez
  _T1IF= 0;
 } // === FIN _T4Interrupt ===
+ * */
 void Secuencia_LCD (unsigned int fila, unsigned int Num_Ventana) ;

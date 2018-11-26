@@ -13,16 +13,11 @@ Descripci?n:
  */
 
 #include "p24HJ256GP610A.h"
-//#include "Explorer16_G7_MISE_v0.h"
-//#include "IO_G7_MISE_v0.h"
-#include "leds_G7.h"
-#include "lcd_G7.h"
-#include "buttons_G7.h"
 #include "system_G7.h"
-#include "interrupts_G7.h"
 
-#define ROWS 8
-#define COLUMNS 14
+
+#define ROWS 2
+#define COLUMNS 12
 
 
 extern void SYS_Initialize ( void ) ;
@@ -33,15 +28,13 @@ int cont_5s = 0;
 int avance_display=0;
 int filas;
 
- 
-char *Texto_1[] ={"==== MISE G7====",     // 16 caracteres lÃ­nea 1 
-                  "===   OSC    ===",
-                  "===  TEMP    ===",
-                  "=== POTENC   ===",
-                  "=== XY JOYST ===",
-                  "=== PC IMP   ===",
-                  "=== 32b TIM  ===",
-                  "=== % CPU    ==="};    // 16 caracteres lÃ­nea 2 
+unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1 
+                            "Medida 1:___"
+                            "Medida 2:___"
+                            "Medida 3:___"
+                            "Medida 4:___"
+                            "Medida 5:___"
+                            "Medida 6:___"};    // 16 caracteres línea 2 
 
 char borra_pantalla[]= {"\x1b[2J"}; // Borra pantalla 0x1b, '[','2','J'
 char cursor_inicio[]= {"\x1b[H"};// Cursor inicio
@@ -86,13 +79,13 @@ void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance)
 //unsigned char i, j; 
 unsigned char i; 
 int j;
-j= avance * 16;
+j= avance * long_linea_txt;
 
-      for(i=0; i<16; i++, j++) 
+      for(i=0; i<long_linea_txt; i++, j++) 
       {      
         Ventana_DATOS[0][i] = texto[j] ; 
       }      
-      for(i=0;i<16;i++,j++)      
+      for(i=0;i<long_linea_txt;i++,j++)      
       {      
         Ventana_DATOS[1][i] = texto[j] ; 
       }   
@@ -100,38 +93,12 @@ j= avance * 16;
     Nop();
 } //FIN Mensaje_FLASH_Ventana_DATOS
 
-
-
-
-void avanzarPantalla (void)
-{
-
-   // Mensaje_FLASH_Ventana_DATOS_mejorado(Texto_1,avance_display);
-//    avance_display++;
-//    EscrituraLCD = DATO;
-
-}
-
 /*
 uint8_t valor = 0x35;
 
 void escribelcd (void)
 {
 
-////=== Pasa un texto de FLASH a RAM y
-//void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto)
-//{
-//    unsigned char i, j;
-//    j= 0;
-//    for(i=0; i<16; i++, j++)
-//    {
-//       Ventana_DATOS[0][i] = texto[j] ;
-//    }
-//    for(i=0;i<16;i++,j++)
-//    {
-//       Ventana_DATOS[1][i] = texto[j] ;
-//    }
-//} //FIN Mensaje_FLASH_Ventana_DATOS
 
     //lcd_cmd(0x80);  //FIXME usa defines
 
@@ -146,6 +113,7 @@ void escribelcd (void)
 
 }
 */
+
 //=== Pasa un texto de FLASH a RAM y 
 void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
 { 
@@ -194,17 +162,17 @@ void escribir_UART(char* txtPrintable)
 }
 
 
-void escribir_RX(char *txtPrintable)
-{
-    int i=0;
-    
-    for(i=0;i<16;i++)
-    {
-        Texto_1[5][i]=txtPrintable[i];
-    }
-}
+//void escribir_RX(char *txtPrintable)
+//{
+//    int i=0;
+//    
+//    for(i=0;i<16;i++)
+//    {
+//        Texto_1[5][i]=txtPrintable[i];
+//    }
+//}
 
-void escribir_UART_DMA(char **txtPrintable)
+void escribir_UART_DMA(char *txtPrintable)
 {
     int i=0,j=0,k=0,l=0;
     
@@ -244,11 +212,12 @@ void escribir_UART_DMA(char **txtPrintable)
     {        
         for(i=0;i<COLUMNS;i++)
         {
-            BufferA[i]=txtPrintable[j][i];
+           // BufferA[i]=txtPrintable[j][i];
+            BufferA[i]= Ventana_DATOS[j][i];
             //delay_ms(50);
         } 
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
- //       DMA0REQbits.FORCE = 1;			// forzar transmision
+        DMA0REQbits.FORCE = 1;			// forzar transmision
         Nop();
         Nop();
         delay_ms(50);
@@ -268,7 +237,7 @@ void escribir_UART_DMA(char **txtPrintable)
   //  putRS232_2(0x0A);
 }
 
-void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
+void EnvioDatosLCD(unsigned char* txtPrintable)
 {
 //    char c;
     
@@ -276,7 +245,7 @@ void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
     if (milis_F2)
     {     
 
-//        char c;
+        char c= "1";
         switch(EscrituraLCD)
         {
             
@@ -295,19 +264,29 @@ void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
                 delay_ms(5);
                 EscrituraLCD = FILA1;
             case FILA1:
+                if(columnaLCD <= long_linea_txt)
+                {
                     lcd_data(Ventana_DATOS[0][columnaLCD]);
                     columnaLCD++;
-                    if (columnaLCD ==16)//fixme usar define                        
+                }
+                else 
+                {
+                    if(columnaLCD <=long_linea)
                     {
-                        columnaLCD =0;                                               
-                        lcd_cmd(0x01);
-                        delay_ms(5);
+                        lcd_data(c);
+                        columnaLCD++;
+                    }
+                    else
+                    {
+                        columnaLCD =0;     
+                        c = "2";
+//                        lcd_cmd(0x01);
+//                        delay_ms(5);
                         lcd_cmd(0xC0);
                         delay_ms(5);
                         EscrituraLCD = FILA2;
-                        //lcd_cmd(0xC0);
-                        //delay_ms(5);
                     }
+                }                                                                           
             break;
             case FILA2:
                     if(columnaLCD==0)
@@ -316,32 +295,24 @@ void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
                         delay_ms(1);
                     }
                     //c=lcd_data(Ventana_DATOS[1][columnaLCD]);
-                    if (columnaLCD < 16)//fixme usar define                        
+                    if (columnaLCD <= long_linea_txt)//fixme usar define                        
                     {
-                        lcd_data(Ventana_DATOS[1][columnaLCD]);
+                        lcd_data(Ventana_DATOS[1][columnaLCD]);                        
                         columnaLCD++;
-                       // columnaLCD =0;
-                        //EscrituraLCD = FILA2;
                     }    
                     else
                     {
+                        if (columnaLCD <= long_linea)
+                        {
+                         lcd_data(c);                        
+                         columnaLCD++;
+                        }
+                        else
                        EscrituraLCD = EVALUA;                                      
                     }
             break;                    
             case EVALUA:
-                    delay_ms(1000);                 
-                    if(filas < n_lineas-1)
-                    {
-                        filas++;
-                        EscrituraLCD = DATO;
-                        columnaLCD =0;  
-                        avance_display++;
-                    }
-                    else
-                    {
-                        EscrituraLCD = INICIO;
 
-                    }
                 break;
            
         }
@@ -362,28 +333,25 @@ void EnvioDatosLCD(unsigned char* txtPrintable,int n_lineas)
 int main(void)
 {
     
-    uint64_t tiempo_exec;
+uint64_t tiempo_exec;
 Nop();
 Nop();
 
-char caracter='a';
+
 char osc_freq=0;
 
 // Inicializaciones 
 
 SYS_Initialize();
+
 Inicializacion_variables();
-escribir_UART_DMA(Texto_1);
+//escribir_UART_DMA(Texto_1);
 
+//parpadea todos los leds
+LATA=0xffff;
+delay_ms(500);
+LATA=0x0000;
 
-        /*
-   // Inic_Oscilador ();
-    Inic_Timer_X ('1', '1', 4000);
-    configura_CN_int();
-    Inic_Leds ();          // Inicializa led D3 de la EXPLORER 16
-    Inic_Pulsadores ();    // Inicializa pulsador S4 de la EXPLORER 16
-    Init_LCD();
-  */  
 // ========================
 // Bucle Principal
     while(1)
@@ -394,11 +362,11 @@ escribir_UART_DMA(Texto_1);
     Nop();
 
 
-    tiempo_exec=time_diff(0);  //0 empieza el contador, 1 devuelve tiempo transcurrido
-    delay_ms(5);
-    tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
+//    tiempo_exec=time_diff(0);  //0 empieza el contador, 1 devuelve tiempo transcurrido
+//    delay_ms(5);
+//    tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
 
-    EnvioDatosLCD(Texto_1, 7);
+    EnvioDatosLCD(Texto_1);
 
     //escribelcd();
     //FIXME: sacar tiempo transcurrido por LCD o UART
@@ -410,22 +378,13 @@ escribir_UART_DMA(Texto_1);
         LED_Toggle(LED_D3);
         flag_1s=0;
         escribir_UART_DMA(Texto_1);
-        escribir_RX(Texto_RX);
+   //     escribir_RX(Texto_RX);
 
        // escribir_UART(Texto_1);
        // DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
      //   DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
-
-
-    //    if(caracter<0x7a)
-    //    {
-    //        caracter++;
-    //       
-    //    }
-    //    else
-    //        caracter=0x41;
 
     }
     if (S3_F==1)
@@ -439,28 +398,32 @@ escribir_UART_DMA(Texto_1);
         
     }
     
-        if (S6_F==1)
+    if (S6_F==1)
     {
         S6_F=0;
-        LED_Sweep_Right();
-        
+        LED_Sweep_Right();        
     }
-
-/*
-    if (pulsador_S4 == pulsador_OFF)
+    
+    if(S4_F==1)
     {
-        Led_D3= ON;
-
-        
+    
+                    if(filas < num_lineas_txt-1)
+                    {
+                        filas++;
+                        EscrituraLCD = DATO;
+                        columnaLCD =0;  
+                        avance_display++;
+                    }
+                    else
+                    {
+                        avance_display=0;
+                        EscrituraLCD = INICIO;
+                        //filas =0;
+                    }
+                    S4_F=0;
     }
-Nop();
-Nop();
-    if (pulsador_S4 == pulsador_ON)
-    {
-        Led_D3= OFF;
 
-    }
-*/
+
   } // Fin while(1)
 } //Fin main
 

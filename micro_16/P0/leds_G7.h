@@ -1,6 +1,7 @@
 
 #ifndef LEDS_H
 #define LEDS_H
+#include "system_G7.h"
 
 typedef enum
 {
@@ -26,5 +27,7 @@ void LED_Toggle(LED led);
 void LED_Sweep_Left(void);
 
 void LED_Sweep_Right(void);
+
+void Inic_Leds (void);
 
 #endif //LEDS_H

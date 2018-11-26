@@ -6,7 +6,9 @@
  *
 */
 #include "p24hj256gp610A.h"
-#include "system_G7.h"
+#include "uart_G7.h"
+
+
 
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 //================================================================
@@ -73,10 +75,10 @@
 //  STEP 6:
 //  Allocate two buffers for DMA transfers
 //********************************************************************************/
-unsigned int BufferA[16] __attribute__((space(dma)));
+unsigned int BufferA[16] __attribute__((space(dma)));//fixme
 unsigned int BufferB[16] __attribute__((space(dma)));
 
-char Texto_RX[16] ={"====  PC RX ===="};
+//unsigned char Texto_RX[] ={"====  PC RX ===="};
 int caracter_RX=0;
 
 //========================================================
@@ -190,7 +192,7 @@ void guarda_uart_rx(void) //cada vez que se recibe un dato y salta la interrupci
 {
     if(caracter_RX<16)
     {
-       Texto_RX[caracter_RX] = U2RXREG;
+//       Texto_RX[caracter_RX] = U2RXREG;
        caracter_RX++;
     }
     else

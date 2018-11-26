@@ -19,7 +19,7 @@ v0.0	Fecha: 15-X-2018
 
 #include "leds_G7.h"
 #include <stdbool.h>
-#include "system_G7.h"
+
 
 #define LED_D3_LAT      LATAbits.LATA0
 #define LED_D4_LAT      LATAbits.LATA1
