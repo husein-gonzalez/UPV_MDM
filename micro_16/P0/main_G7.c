@@ -39,7 +39,7 @@ char *Texto_1[] ={"==== MISE G7====",     // 16 caracteres l√≠nea 1
                   "===  TEMP    ===",
                   "=== POTENC   ===",
                   "=== XY JOYST ===",
-                  "=== PC INP   ===",
+                  "=== PC IMP   ===",
                   "=== 32b TIM  ===",
                   "=== % CPU    ==="};    // 16 caracteres l√≠nea 2 
 
@@ -193,29 +193,49 @@ void escribir_UART(char* txtPrintable)
     putRS232_2(0x0A);
 }
 
+
+void escribir_RX(char *txtPrintable)
+{
+    int i=0;
+    
+    for(i=0;i<16;i++)
+    {
+        Texto_1[5][i]=txtPrintable[i];
+    }
+}
+
 void escribir_UART_DMA(char **txtPrintable)
 {
     int i=0,j=0,k=0,l=0;
     
-    
-
-        for(l=0;l<6;l++)
+        delay_ms(50);
+        Nop();
+        Nop();
+        for(l=0;l<6;l++)    //borra pantalla teraterm
         {
           BufferA[l]=borra_pantalla[l];
         }
-        delay_ms(5);
+        delay_ms(50);
+        Nop();
+        Nop();
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
         DMA0REQbits.FORCE = 1;			// forzar transmision
-        delay_ms(5);
+        Nop();
+        Nop();
+        delay_ms(50);
         
-        for(k=0;k<5;k++)
+        for(k=0;k<5;k++)    //pone teraterm al inicio de pantalla
         {
           BufferA[k]=cursor_inicio[k];
         }
-        delay_ms(5);
+        Nop();
+        Nop();
+        delay_ms(50);
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
         DMA0REQbits.FORCE = 1;			// forzar transmision
-        delay_ms(5);
+        Nop();
+        Nop();
+        delay_ms(50);
     
 
     
@@ -225,16 +245,22 @@ void escribir_UART_DMA(char **txtPrintable)
         for(i=0;i<COLUMNS;i++)
         {
             BufferA[i]=txtPrintable[j][i];
-            delay_ms(50);
+            //delay_ms(50);
         } 
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
  //       DMA0REQbits.FORCE = 1;			// forzar transmision
+        Nop();
+        Nop();
         delay_ms(50);
         BufferA[0]=0x0D;
         BufferA[1]=0x0A;
+        Nop();
+        Nop();
         delay_ms(50);
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
         DMA0REQbits.FORCE = 1;			// forzar transmision
+        Nop();
+        Nop();
         delay_ms(50);
         
     }
@@ -384,6 +410,8 @@ escribir_UART_DMA(Texto_1);
         LED_Toggle(LED_D3);
         flag_1s=0;
         escribir_UART_DMA(Texto_1);
+        escribir_RX(Texto_RX);
+
        // escribir_UART(Texto_1);
        // DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envÌo
      //   DMA0REQbits.FORCE = 1;			// forzar transmision

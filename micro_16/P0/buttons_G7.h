@@ -38,6 +38,12 @@ extern "C" {
 #define  pulsador_ON 0
 #define  pulsador_OFF 1
 
+void Inic_Pulsadores (void);
+    
+    
+    
+    
+    
 #ifdef	__cplusplus
 }
 #endif

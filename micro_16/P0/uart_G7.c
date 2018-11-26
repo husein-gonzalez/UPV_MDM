@@ -76,6 +76,9 @@
 unsigned int BufferA[16] __attribute__((space(dma)));
 unsigned int BufferB[16] __attribute__((space(dma)));
 
+char Texto_RX[16] ={"====  PC RX ===="};
+int caracter_RX=0;
+
 //========================================================
 void Inic_RS232_2 (int freq ) //freq = 0 => 8MHz, freq= 1 => 80Mhz
 {
@@ -183,6 +186,19 @@ char getRS232_2( void)
  return U2RXREG; // recoge el dato
 } // FIN getRS232_2 
 
+void guarda_uart_rx(void) //cada vez que se recibe un dato y salta la interrupcion de RX se guarda en el buffer, y cada 1s se carga en ventan
+{
+    if(caracter_RX<16)
+    {
+       Texto_RX[caracter_RX] = U2RXREG;
+       caracter_RX++;
+    }
+    else
+        caracter_RX=0;
+    
+    
+    
+}
 
 
 // ====== Servicio INTERRUPCION TRANSMISION RS232_2 ==============
@@ -196,8 +212,10 @@ void _ISR_NO_PSV _U2TXInterrupt(void)
 // Recoge el dato recibido byte a byte
 void _ISR_NO_PSV _U2RXInterrupt ( void)
 {
-// ?????
- _U2RXIF = 0;
+    _U2RXIF = 0;
+    LED_Toggle(LED_D4);
+    guarda_uart_rx();
+ 
 } // FIN _U2RXInterruptt
 
 void __attribute__((interrupt, no_auto_psv)) _U2ErrInterrupt (void)
@@ -234,11 +252,17 @@ void cfgUart2_DMA(int freq)
         //  STEP 2:
         //  Enable UART Rx and Tx
         //********************************************************************************/
+        
+        _U2RXIP = 4;                    //prioridad int RX uart
+        _U2RXIF = 0;
+        _U2RXIE = 1;                    //Enable UART RX interrupt
         U2MODEbits.UARTEN   = 1;		// Enable UART
         U2STAbits.UTXEN     = 1;		// Enable UART Tx
 
 
+
         IEC4bits.U2EIE = 0;
+        //IEC1bits.U2RXIE = 1;
     }
     
           

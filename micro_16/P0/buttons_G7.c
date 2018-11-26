@@ -2,7 +2,7 @@
 
 #include "p24HJ256GP610A.h"
 #include "buttons_G7.h"
-#include "system_G7.h"
+//#include "system_G7.h"
 
 
 
