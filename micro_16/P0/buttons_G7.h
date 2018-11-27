@@ -17,6 +17,7 @@ extern "C" {
 
 #define IE_PULSADOR_S3 _CN15IE
 #define IE_PULSADOR_S4 _CN19IE
+#define IE_PULSADOR_S5 _CN23IE
 #define IE_PULSADOR_S6 _CN16IE
    
 #define pulsador_S3  PORTDbits.RD6
@@ -38,6 +39,9 @@ extern "C" {
 #define  pulsador_ON 0
 #define  pulsador_OFF 1
 
+extern int S5_entrada; //flagf que se pone a 1 cuando el pulsador esta configurado como entrada y a 0 como salida    
+    
+    
 void Inic_Pulsadores (void);
     
     

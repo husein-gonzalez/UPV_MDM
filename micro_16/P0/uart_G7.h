@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 #include "system_G7.h"    
-extern unsigned int BufferA[16] __attribute__((space(dma)));
+extern unsigned int BufferA[16] __attribute__((space(dma)));//fixme montar define
 extern unsigned int BufferB[16] __attribute__((space(dma)));
 //extern char Texto_RX[16];    
 

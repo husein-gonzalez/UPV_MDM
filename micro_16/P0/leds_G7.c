@@ -37,8 +37,8 @@ v0.0	Fecha: 15-X-2018
 #define LED_D7_TRIS     TRISAbits.TRISA4
 #define LED_D8_TRIS     TRISAbits.TRISA5
 #define LED_D9_TRIS     TRISAbits.TRISA6
-#define LED_D10_TRIS    TRISAbits.TRISA7    //solapa con S5
-
+//#define LED_D10_TRIS    TRISAbits.TRISA7    //solapa con S5
+//simepre uso el del pulsador y cuando quiero usar el del pongo el tris a 0
 
 
 
@@ -80,9 +80,23 @@ void LED_On(LED led)
             break ;
 
         case LED_D10:
+            //PONER ESTE PIN COMO DE SALIDA
+            pulsador_S5_TRIS = 0;
+            S5_entrada =0;
             LED_D10_LAT = LED_ON ;
             break ;
-
+        case ALL:
+            pulsador_S5_TRIS = 0;
+            S5_entrada = 0;
+            LED_D3_LAT = LED_ON ;
+            LED_D4_LAT = LED_ON ;
+            LED_D5_LAT = LED_ON ;
+            LED_D6_LAT = LED_ON ;
+            LED_D7_LAT = LED_ON ;
+            LED_D8_LAT = LED_ON ;
+            LED_D9_LAT = LED_ON ;
+            LED_D10_LAT = LED_ON ;
+            break;
         default:
             break;
     }
@@ -122,9 +136,23 @@ void LED_Off(LED led)
             break ;
 
         case LED_D10:
+            //PONER ESTE PIN COMO DE ENTRADA Y HABILITAR INTERRUPTS
+            pulsador_S5_TRIS = 1;
+            S5_entrada = 1;
             LED_D10_LAT = LED_OFF ;
             break ;
-
+        case ALL:
+            pulsador_S5_TRIS = 1;
+            S5_entrada = 1;
+            LED_D3_LAT = LED_OFF ;
+            LED_D4_LAT = LED_OFF ;
+            LED_D5_LAT = LED_OFF ;
+            LED_D6_LAT = LED_OFF ;
+            LED_D7_LAT = LED_OFF ;
+            LED_D8_LAT = LED_OFF ;
+            LED_D9_LAT = LED_OFF ;
+            LED_D10_LAT = LED_OFF ;
+            break;
         default:
             break;
     }
@@ -158,13 +186,15 @@ void LED_Toggle(LED led)
         case LED_D8:
             LED_D8_LAT ^= 1;
             break;
-
         case LED_D9:
             LED_D9_LAT ^= 1;
             break;
-
         case LED_D10:
-            LED_D10_LAT ^= 1;
+            if(S5_entrada == 0)            
+               LED_On(LED_D10);                           
+            else
+                LED_Off(LED_D10); 
+            
             break;
 
         default:

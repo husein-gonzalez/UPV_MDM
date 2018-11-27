@@ -129,7 +129,7 @@ void Inic_Timer_67 () //
     
 } 
 
-//prueba git
+
 void delay_ms (int milis) //milisegundos
 {
     int cnt=0;
@@ -139,8 +139,7 @@ void delay_ms (int milis) //milisegundos
         if (milis_F ==1)
         {
             cnt++;  
-            milis_F=0;
-            
+            milis_F=0;            
         }
                
     }
