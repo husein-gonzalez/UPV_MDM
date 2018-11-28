@@ -354,23 +354,6 @@ delay_ms(500);
 LATA=0x0000;
 
 
-//////FIXME
-//configura ADC
-   //     case ADC_CHANNEL_5: potenciometro
-            
-            
-            
-_SAMP= 1; 
-
-CAD1_encuesta ();
-            
-adcResult5 = ADCValue;
-
-  //      case ADC_CHANNEL_4: Temp
-        //    AD1PCFGLbits.PCFG4 = 0 ;
-            
-
-
 // ========================
 // Bucle Principal
     while(1)
@@ -404,6 +387,14 @@ adcResult5 = ADCValue;
      //   DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
+    // fixme
+    _SAMP= 1; 
+
+    CAD1_encuesta ();
+            
+    adcResult5 = ADCValue;
+    
+    
 
     }
     if (S3_F==1)
