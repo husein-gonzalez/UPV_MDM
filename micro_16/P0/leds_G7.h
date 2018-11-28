@@ -13,7 +13,8 @@ typedef enum
     LED_D7,
     LED_D8,
     LED_D9,
-    LED_D10
+    LED_D10,
+    ALL
 } LED;
 
 #define LED_COUNT 8

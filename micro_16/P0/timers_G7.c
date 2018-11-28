@@ -139,8 +139,7 @@ void delay_ms (int milis) //milisegundos
         if (milis_F ==1)
         {
             cnt++;  
-            milis_F=0;
-            
+            milis_F=0;            
         }
                
     }

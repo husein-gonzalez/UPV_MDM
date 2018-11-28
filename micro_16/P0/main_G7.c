@@ -16,17 +16,20 @@ Descripci?n:
 #include "system_G7.h"
 
 
-#define ROWS 2
-#define COLUMNS 12
+#define ROWS 7
+#define COLUMNS 16
 
 
 extern void SYS_Initialize ( void ) ;
 int Str_i, Str_j;
 int EscrituraLCD;
+int EscrituraUART;
 int columnaLCD;
+int columnaUART;
 int cont_5s = 0;
 int avance_display=0;
 int filas;
+int filasUART;
 
 unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1 
                             "Medida 1:___"
@@ -34,10 +37,10 @@ unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1
                             "Medida 3:___"
                             "Medida 4:___"
                             "Medida 5:___"
-                            "Medida 6:___"};    // 16 caracteres línea 2 
+                            "Medida 6:___"};  // 16 caracteres línea 2 
 
-char borra_pantalla[]= {"\x1b[2J"}; // Borra pantalla 0x1b, '[','2','J'
-char cursor_inicio[]= {"\x1b[H"};// Cursor inicio
+char borra_pantalla[]= {"         \x1b[2J"}; // Borra pantalla 0x1b, '[','2','J'
+char cursor_inicio[]=  {"          \x1b[H"};// Cursor inicio
 
 enum{
     INICIO,
@@ -45,6 +48,12 @@ enum{
     FILA1,
     FILA2,
     EVALUA
+};
+enum{
+    INICIO_UART,
+    CURSOR_INICIO,
+    SALTO_DE_CARRO,
+    ESCRIBE_LINEA
 };
 
 
@@ -54,7 +63,10 @@ void Inicializacion_variables(void)
     Str_i = 0;
     Str_j = 0;
     EscrituraLCD = INICIO;
+    EscrituraUART = INICIO_UART;
     columnaLCD = 0;
+    columnaUART = 0;
+    filasUART = 0;
 }
 
 //=== Pasa un texto de FLASH a RAM y 
@@ -78,41 +90,33 @@ void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance)
 { 
 //unsigned char i, j; 
 unsigned char i; 
-int j;
+int j,k;
 j= avance * long_linea_txt;
 
       for(i=0; i<long_linea_txt; i++, j++) 
       {      
         Ventana_DATOS[0][i] = texto[j] ; 
-      }      
+      } 
+        k=j;
+	  for(i=long_linea_txt; i<long_linea; i++, j++) 
+      {      
+        Ventana_DATOS[0][i] = 0x30;//caracter "1" 
+      }    
+        j=k;
       for(i=0;i<long_linea_txt;i++,j++)      
       {      
         Ventana_DATOS[1][i] = texto[j] ; 
-      }   
+      }
+ 		for(i=long_linea_txt; i<long_linea; i++, j++) 
+      {      
+         Ventana_DATOS[1][i] = 0x35;//caracter "1" 
+      }      
+
     Nop();
     Nop();
 } //FIN Mensaje_FLASH_Ventana_DATOS
 
-/*
-uint8_t valor = 0x35;
 
-void escribelcd (void)
-{
-
-
-    //lcd_cmd(0x80);  //FIXME usa defines
-
-
-    lcd_data(valor++);
-    // lcd_cmd(0xc0);  //FIXME usa defines
-
-
-   // lcd_data(0x35);
-    
-    delay_ms(5);
-
-}
-*/
 
 //=== Pasa un texto de FLASH a RAM y 
 void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
@@ -171,7 +175,7 @@ void escribir_UART(char* txtPrintable)
 //        Texto_1[5][i]=txtPrintable[i];
 //    }
 //}
-
+/*
 void escribir_UART_DMA(char *txtPrintable)
 {
     int i=0,j=0,k=0,l=0;
@@ -179,20 +183,20 @@ void escribir_UART_DMA(char *txtPrintable)
         delay_ms(50);
         Nop();
         Nop();
-        for(l=0;l<6;l++)    //borra pantalla teraterm
+        for(l=0;l<16;l++)    //borra pantalla teraterm
         {
           BufferA[l]=borra_pantalla[l];
         }
         delay_ms(50);
         Nop();
         Nop();
-        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+//        DMA0REQbits.FORCE = 1;			// forzar transmision
         Nop();
         Nop();
         delay_ms(50);
         
-        for(k=0;k<5;k++)    //pone teraterm al inicio de pantalla
+        for(k=0;k<16;k++)    //pone teraterm al inicio de pantalla
         {
           BufferA[k]=cursor_inicio[k];
         }
@@ -200,7 +204,7 @@ void escribir_UART_DMA(char *txtPrintable)
         Nop();
         delay_ms(50);
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        DMA0REQbits.FORCE = 1;			// forzar transmision
         Nop();
         Nop();
         delay_ms(50);
@@ -217,12 +221,12 @@ void escribir_UART_DMA(char *txtPrintable)
             //delay_ms(50);
         } 
         DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
-        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        DMA0REQbits.FORCE = 1;			// forzar transmision
         Nop();
         Nop();
         delay_ms(50);
-        BufferA[0]=0x0D;
-        BufferA[1]=0x0A;
+//        BufferA[0]=0x0D;
+//        BufferA[1]=0x0A;
         Nop();
         Nop();
         delay_ms(50);
@@ -236,6 +240,174 @@ void escribir_UART_DMA(char *txtPrintable)
    // putRS232_2(0x0D);
   //  putRS232_2(0x0A);
 }
+*/
+
+void escribir_UART_DMA(char *txtPrintable)
+{
+//    int i=0,j=0,k=0,l=0;
+    
+    
+    switch(EscrituraUART)
+    {
+        case INICIO_UART:
+          
+              if (columnaUART > 16)//fixme usar define                        
+            {          
+                 //// delay_ms(50);
+                     DMA0CONbits.CHEN  = 1;	
+                     DMA0REQbits.FORCE = 1;	
+                     delay_ms(50);
+                    columnaUART = 0;
+                    EscrituraUART = CURSOR_INICIO;
+                    filasUART = 0;
+            }
+            else
+            {
+
+                  BufferA[columnaUART]=borra_pantalla[columnaUART];
+                  columnaUART++;
+            }               
+            break;
+        case CURSOR_INICIO:
+          
+              if (columnaUART > 16)//fixme usar define                        
+            {          
+                     delay_ms(50);
+                     DMA0CONbits.CHEN  = 1;	
+                     DMA0REQbits.FORCE = 1;	
+                     delay_ms(50);
+                    columnaUART = 0;
+                    EscrituraUART = SALTO_DE_CARRO;
+                    filasUART = 0;
+            }
+            else
+            {
+
+                  BufferA[columnaUART]=cursor_inicio[columnaUART];
+                  columnaUART++;
+            }               
+            break;
+            
+        case SALTO_DE_CARRO:
+            if (columnaUART < 14 )//fixme usar define                        
+            {       
+                 BufferA[columnaUART]=0x20;
+                 columnaUART++;
+               
+            }
+            else
+            {
+                 if (columnaUART < 15 )
+                 {
+                    BufferA[columnaUART]=0x0A;
+                    columnaUART++;
+                    BufferA[columnaUART]=0x0D;
+                    columnaUART++;
+                 }
+                 else
+                 {
+                     delay_ms(50);
+                     DMA0CONbits.CHEN  = 1;	
+                     DMA0REQbits.FORCE = 1;	
+                     delay_ms(50);
+                 columnaUART = 0;
+                 EscrituraUART = ESCRIBE_LINEA;
+                 }
+            }
+               
+            break;
+        case ESCRIBE_LINEA:
+            if(columnaUART ==0)
+            {
+                 Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,filasUART);                  
+            
+            
+            }
+            if (columnaUART == 16)//fixme usar define                        
+            {          
+                filasUART++;
+                if(filasUART == ROWS)
+                    EscrituraUART = INICIO_UART;
+                else
+                    EscrituraUART = SALTO_DE_CARRO;
+                columnaUART = 0;
+               // EscrituraUART = SALTO_DE_CARRO;
+                delay_ms(50);
+                DMA0CONbits.CHEN  = 1;	
+                DMA0REQbits.FORCE = 1;	
+                delay_ms(50);
+            }
+            else
+            {
+                //BufferA[columnaUART] = 0x41;
+                BufferA[columnaUART] = Ventana_DATOS[0][columnaUART];
+                columnaUART++;
+            }
+            break;      
+    }
+     
+}
+        
+//        
+//        
+//    }
+//        delay_ms(50);
+//        Nop();
+//        Nop();
+//        for(l=0;l<16;l++)    //borra pantalla teraterm
+//        {
+//          BufferA[l]=borra_pantalla[l];
+//        }
+//        delay_ms(50);
+//        Nop();
+//        Nop();
+////        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+////        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+//        
+//        for(k=0;k<16;k++)    //pone teraterm al inicio de pantalla
+//        {
+//          BufferA[k]=cursor_inicio[k];
+//        }
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+//        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+////        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+//    
+
+    
+    
+//    for(j=0;j<ROWS;j++)
+//    {        
+//        for(i=0;i<COLUMNS;i++)
+//        {
+//           // BufferA[i]=txtPrintable[j][i];
+//            BufferA[i]= Ventana_DATOS[j][i];
+//            //delay_ms(50);
+//        } 
+//        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+////        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+////        BufferA[0]=0x0D;
+////        BufferA[1]=0x0A;
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+//        DMA0CONbits.CHEN  = 1;			// Rehabilitar Canal 0, necesario cada envío
+//        DMA0REQbits.FORCE = 1;			// forzar transmision
+//        Nop();
+//        Nop();
+//        delay_ms(50);
+//        
+//    }
 
 void EnvioDatosLCD(unsigned char* txtPrintable)
 {
@@ -250,7 +422,7 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
         {
             
             case INICIO:
-                filas = 1;
+                filas = 0;
                 columnaLCD =0;  
                 avance_display = 0;
                 EscrituraLCD = DATO;
@@ -264,50 +436,26 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
                 delay_ms(5);
                 EscrituraLCD = FILA1;
             case FILA1:
-                if(columnaLCD <= long_linea_txt)
-                {
-                    lcd_data(Ventana_DATOS[0][columnaLCD]);
+  					lcd_data(Ventana_DATOS[0][columnaLCD]);
                     columnaLCD++;
-                }
-                else 
-                {
-                    if(columnaLCD <=long_linea)
+                    if (columnaLCD ==16)//fixme usar define                        
                     {
-                        lcd_data(c);
-                        columnaLCD++;
-                    }
-                    else
-                    {
-                        columnaLCD =0;     
-                        c = "2";
-//                        lcd_cmd(0x01);
-//                        delay_ms(5);
+                        columnaLCD =0;                                               
+                        lcd_cmd(0x01);
+                        delay_ms(5);
                         lcd_cmd(0xC0);
                         delay_ms(5);
                         EscrituraLCD = FILA2;
-                    }
-                }                                                                           
+                    }                                                                   
             break;
             case FILA2:
-                    if(columnaLCD==0)
+  					if (columnaLCD < 16)//fixme usar define                        
                     {
-                       lcd_cmd(0xC0);
-                        delay_ms(1);
-                    }
-                    //c=lcd_data(Ventana_DATOS[1][columnaLCD]);
-                    if (columnaLCD <= long_linea_txt)//fixme usar define                        
-                    {
-                        lcd_data(Ventana_DATOS[1][columnaLCD]);                        
+                        lcd_data(Ventana_DATOS[1][columnaLCD]);
                         columnaLCD++;
                     }    
                     else
                     {
-                        if (columnaLCD <= long_linea)
-                        {
-                         lcd_data(c);                        
-                         columnaLCD++;
-                        }
-                        else
                        EscrituraLCD = EVALUA;                                      
                     }
             break;                    
@@ -349,9 +497,11 @@ Inicializacion_variables();
 //escribir_UART_DMA(Texto_1);
 
 //parpadea todos los leds
-LATA=0xffff;
+//LATA=0xffff;
+LED_On(ALL);
 delay_ms(500);
-LATA=0x0000;
+LED_Off(ALL);
+////LATA=0x0000;
 
 
 // ========================
@@ -369,8 +519,8 @@ LATA=0x0000;
 //    tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
 
     EnvioDatosLCD(Texto_1);
+     escribir_UART_DMA(Texto_1);
 
-    //escribelcd();
     //FIXME: sacar tiempo transcurrido por LCD o UART
 
     if (flag_1s ==1)
@@ -379,7 +529,7 @@ LATA=0x0000;
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
-        escribir_UART_DMA(Texto_1);
+       // escribir_UART_DMA(Texto_1);
    //     escribir_RX(Texto_RX);
 
        // escribir_UART(Texto_1);
@@ -417,20 +567,26 @@ LATA=0x0000;
     if(S4_F==1)
     {
     
-                    if(filas < num_lineas_txt-1)
+                    if(filas < num_lineas_txt-2)
                     {
                         filas++;
                         EscrituraLCD = DATO;
-                        columnaLCD =0;  
+                        columnaLCD = 0;  
                         avance_display++;
                     }
-                    else
-                    {
-                        avance_display=0;
-                        EscrituraLCD = INICIO;
-                        //filas =0;
-                    }
                     S4_F=0;
+    }
+ if(S5_F==1)
+    {
+    
+                    if(filas > 0)
+                    {
+                        filas--;
+                        EscrituraLCD = DATO;
+                        columnaLCD = 0;  
+                        avance_display--;
+                    }
+                    S5_F=0;
     }
 
 

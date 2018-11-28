@@ -9,7 +9,7 @@
 
 
 
-unsigned char Ventana_DATOS [num_lineas][long_linea_txt] __attribute__((space(dma)));             
+unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
 
 
 
@@ -78,6 +78,11 @@ void Init_LCD (void )
  delay_ms( 1 ); //Bucle de 40us bloqueante
  lcd_cmd(entry_mode); // entry mode set (0x06)
  delay_ms( 1 ); //Bucle de 40us bloqueante
+                lcd_cmd(0x01);//susana fixme
+                delay_ms(1);
+                lcd_cmd(0x02);
+                delay_ms(1);
+              
  //lcd_data(0x33);
  
  //Inic_Timer_LCD_Int ();

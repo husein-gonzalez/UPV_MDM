@@ -4,7 +4,7 @@
 
 
 
-int contador_1ms=0, flag_1s=0, S3_F=0 ,S4_F=0, S6_F=0;
+int contador_1ms=0, flag_1s=0, S3_F=0 ,S4_F=0, S5_F=0, S6_F=0;
 
 
 void configura_CN_int(void)
@@ -14,6 +14,7 @@ void configura_CN_int(void)
     _CNIF=0;
     IE_PULSADOR_S3=1;
     IE_PULSADOR_S4=1;
+    IE_PULSADOR_S5=1;
     IE_PULSADOR_S6=1;
     _CNIE=1;     
     
@@ -34,6 +35,11 @@ void _ISR _CNInterrupt(void)
    {
        //LED_On(LED_D3);
        S4_F=1;       
+   }
+   if (pulsador_S5 == pulsador_ON)
+   {
+       //LED_On(LED_D3);
+       S5_F=1;       
    }
    if (pulsador_S6 == pulsador_ON)
    {
