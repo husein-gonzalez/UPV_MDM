@@ -26,7 +26,7 @@ extern "C" {
 #include "timers_G7.h"
 #include "interrupts_G7.h"
 #include "uart_G7.h"
-//#include "adc_G7.h"
+#include "adc_G7.h"
     
     
  

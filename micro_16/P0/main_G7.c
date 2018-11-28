@@ -334,6 +334,7 @@ int main(void)
 {
     
 uint64_t tiempo_exec;
+uint16_t adcResult4, adcResult5;
 Nop();
 Nop();
 
@@ -351,6 +352,24 @@ Inicializacion_variables();
 LATA=0xffff;
 delay_ms(500);
 LATA=0x0000;
+
+
+//////FIXME
+//configura ADC
+   //     case ADC_CHANNEL_5: potenciometro
+            
+            
+            
+_SAMP= 1; 
+
+CAD1_encuesta ();
+            
+adcResult5 = ADCValue;
+
+  //      case ADC_CHANNEL_4: Temp
+        //    AD1PCFGLbits.PCFG4 = 0 ;
+            
+
 
 // ========================
 // Bucle Principal
