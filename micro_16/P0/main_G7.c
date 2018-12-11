@@ -30,11 +30,25 @@ int cont_5s = 0;
 int avance_display=0;
 int filas;
 int filasUART;
+unsigned int Medidas1 = 2222;
+unsigned int Medidas2 = 1111;
+//unsigned int Medidas3;
+//unsigned int Medidas4;
+//unsigned int Medidas5;
+//unsigned int Medidas6;
+//fixme provisional hacer array
+//Medidas1 = 111;
+//Medidas2 = 222;
+//Medidas3 = 333;
+//Medidas4 = 444;
+//Medidas5 = 555;
+//Medidas6 = 666;
+
 
 unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1 
-                            "Medida 1:___"
-                            "Medida 2:___"
-                            "Medida 3:___"
+                            "Temperatura:"
+                            "Resistencia:"
+                            "TMR:       _"
                             "Medida 4:___"
                             "Medida 5:___"
                             "Medida 6:___"};  // 16 caracteres línea 2 
@@ -69,27 +83,49 @@ void Inicializacion_variables(void)
     filasUART = 0;
 }
 
-//=== Pasa un texto de FLASH a RAM y 
-//void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
-//{ 
-//unsigned char i, j; 
-//j= 0; 
-//for(i=0; i<16; i++, j++) 
-//      {      
-//        Ventana_DATOS[0][i] = texto[j] ; 
-//      }      
-//      for(i=0;i<16;i++,j++)      
-//      {      
-//        Ventana_DATOS[1][i] = texto[j] ; 
-//      }      
-//} //FIN Mensaje_FLASH_Ventana_DATOS
+
+void ConvierteMedida(int n_medida, unsigned char *ValorMed)
+{
+   // int valor = Medidas1 ;//fixme cargar la variable que si es
+    int valor = Medidas1;//fixme cargar la variable que si es
+    int valor1 = 0;//fixme cargar la variable que si es
+    int i;
+   
+//    for (i=0; i < 4; i++)
+//    {
+        //ValorMed[3] = ((valor%1000)+ '0');
+        valor1 = valor/1000;
+        ValorMed[3] = valor1+'0';
+        valor = (valor%1000);
+        valor1 = valor/100;
+        ValorMed[2] = (valor1+'0');
+        valor = valor%100;
+        valor1 = valor/10;
+        ValorMed[1] = valor1+'0';
+        valor = valor%10;
+        valor1 = valor;
+        ValorMed[0] = (valor1+'0');
+//        valor = valor/10;
+//    }
+    
+   
+    
+
+
+
+
+
+}
+
 
 
 //=== Pasa un texto de FLASH a RAM y 
 void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance) 
 { 
 //unsigned char i, j; 
-unsigned char i; 
+//unsigned char i; 
+unsigned int i; 
+unsigned char ValorMed[4]; 
 int j,k;
 j= avance * long_linea_txt;
 
@@ -98,10 +134,12 @@ j= avance * long_linea_txt;
         Ventana_DATOS[0][i] = texto[j] ; 
       } 
         k=j;
+      ConvierteMedida(avance+1, ValorMed);
 	  for(i=long_linea_txt; i<long_linea; i++, j++) 
-      {      
-        Ventana_DATOS[0][i] = 0x30;//caracter "1" 
-      }    
+      {    
+          
+        Ventana_DATOS[0][i] = ValorMed[i-long_linea_txt];//caracter "1" 
+      } 
         j=k;
       for(i=0;i<long_linea_txt;i++,j++)      
       {      
@@ -109,7 +147,7 @@ j= avance * long_linea_txt;
       }
  		for(i=long_linea_txt; i<long_linea; i++, j++) 
       {      
-         Ventana_DATOS[1][i] = 0x35;//caracter "1" 
+         Ventana_DATOS[1][i] = 0x35;//caracter "5" 
       }      
 
     Nop();
@@ -345,7 +383,7 @@ void escribir_UART_DMA(char *txtPrintable)
             }
             break;      
     }
-     
+   
 }
         
 //        
