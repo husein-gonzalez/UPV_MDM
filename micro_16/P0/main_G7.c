@@ -30,8 +30,13 @@ int cont_5s = 0;
 int avance_display=0;
 int filas;
 int filasUART;
-unsigned int Medidas1 = 2222;
-unsigned int Medidas2 = 1111;
+unsigned int Medidas1 = 1234;
+unsigned int Medidas2 = 0000;
+unsigned int Medidas3 = 0000;
+unsigned int Medidas4 = 0000;
+unsigned int Medidas5 = 0000;
+unsigned int Medidas6 = 0000;
+unsigned int Medidas7 = 0000;
 //unsigned int Medidas3;
 //unsigned int Medidas4;
 //unsigned int Medidas5;
@@ -87,24 +92,48 @@ void Inicializacion_variables(void)
 void ConvierteMedida(int n_medida, unsigned char *ValorMed)
 {
    // int valor = Medidas1 ;//fixme cargar la variable que si es
-    int valor = Medidas1;//fixme cargar la variable que si es
+    int valor; //fixme cargar la variable que si es
     int valor1 = 0;//fixme cargar la variable que si es
     int i;
    
+    switch(n_medida)
+    {
+            case 0:
+                valor = Medidas1;
+                break;
+            case 1:
+                valor = Medidas1;
+                break;
+            case 2:
+                valor = Medidas3;
+                break;
+            case 3:
+                valor = Medidas4;
+                break;
+            case 4:
+                valor = Medidas5;
+                break;
+            case 5:
+                valor = Medidas6;
+                break;
+            case 6:
+                valor = Medidas7;
+                break;
+    }
 //    for (i=0; i < 4; i++)
 //    {
         //ValorMed[3] = ((valor%1000)+ '0');
         valor1 = valor/1000;
-        ValorMed[3] = valor1+'0';
+        ValorMed[0] = valor1+'0';
         valor = (valor%1000);
         valor1 = valor/100;
-        ValorMed[2] = (valor1+'0');
+        ValorMed[1] = (valor1+'0');
         valor = valor%100;
         valor1 = valor/10;
-        ValorMed[1] = valor1+'0';
+        ValorMed[2] = valor1+'0';
         valor = valor%10;
         valor1 = valor;
-        ValorMed[0] = (valor1+'0');
+        ValorMed[3] = (valor1+'0');
 //        valor = valor/10;
 //    }
     
@@ -145,9 +174,10 @@ j= avance * long_linea_txt;
       {      
         Ventana_DATOS[1][i] = texto[j] ; 
       }
+        ConvierteMedida(avance+2, ValorMed);
  		for(i=long_linea_txt; i<long_linea; i++, j++) 
       {      
-         Ventana_DATOS[1][i] = 0x35;//caracter "5" 
+         Ventana_DATOS[1][i] = ValorMed[i-long_linea_txt];//caracter "5" 
       }      
 
     Nop();
@@ -304,7 +334,7 @@ void escribir_UART_DMA(char *txtPrintable)
 
                   BufferA[columnaUART]=borra_pantalla[columnaUART];
                   columnaUART++;
-            }               
+           }               
             break;
         case CURSOR_INICIO:
           
