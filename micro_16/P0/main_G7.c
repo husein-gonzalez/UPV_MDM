@@ -540,7 +540,7 @@ LED_On(ALL);
 delay_ms(500);
 LED_Off(ALL);
 ////LATA=0x0000;
-
+Medidas1=0;
 
 // ========================
 // Bucle Principal
@@ -563,7 +563,7 @@ LED_Off(ALL);
 
     if (flag_1s ==1)
     {
-
+        Medidas1++;
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
