@@ -537,14 +537,12 @@ LED_Off(ALL);
      //   DMA0REQbits.FORCE = 1;			// forzar transmision
 	cont_5s++;
 
-    // fixme
-    _SAMP= 1; 
 
-    CAD1_encuesta ();
+ //   CAD1_encuesta ();
             
-    adcResult5 = ADCValue;
+  //  adcResult5 = ADCValue;
     
-    
+ 
 
     }
     if (S3_F==1)

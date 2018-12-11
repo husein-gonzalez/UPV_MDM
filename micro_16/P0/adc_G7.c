@@ -32,7 +32,7 @@ AD1CON1= 0;	// 0x00E0
 //_AD12B = 0; 	//1=Modo operacion de 12 bits / 0=Modo operacion de 10 bits 
 //_FORM = 0; 	//Formato datos salida: 00=Integer (0000 00dd dddd dddd)
                                      // 01=Signed integer (ssss sssd dddd dddd)
-_SSRC = 0b000; 	//FIXME Termina muestreo y comienca conversion del CAD
+_SSRC = 0b111; 	//FIXME Termina muestreo y comienca conversion del CAD
 				//111=Auto-coonvert / 101 = TMR3 ADC1 y TMR5 ADC2 /
                 // 010=TMR3  ADC1 y TMR5 ADC2
                 // 001=INT0 / 000= hay que borrar SAMP
@@ -57,8 +57,8 @@ AD1CON2= 0;	//
 
 AD1CON3 = 0;
 _ADRC = 0; 		//1= reloj RC / 0= Reloj CPU
-_SAMC = 0b10000;		//Tiempo auto muestreo0 n?de Tad (de 0 a 31Tad)
-_ADCS = 0xff; 		//Tad= >75ns = Tcy(ADCS+1) -> a 80MHz Tcy= 25ns 
+_SAMC = 31;		//Tiempo auto muestreo0 n?de Tad (de 0 a 31Tad)
+_ADCS = 0x3f; 		//Tad= >75ns = Tcy(ADCS+1) -> a 80MHz Tcy= 25ns 
 
 AD1CON4= 0;
 //_DMABL = 3; 	//Cada buffer contiene 8 palabras 
@@ -232,7 +232,7 @@ DMA6REQbits.FORCE = 0; // manual / autom?tico
 // 0x0A SPI1
 // 0x0B UART1RX
 // 0x0C UART1TX
-DMA6REQbits.IRQSEL = 0x0D; // ADC1 //DMA_IRQ_ADC1 
+DMA6REQbits.IRQSEL = 0x0D; // ADC1 //DMA_IRQ_ADC1 //FIXME usar el ADC2
 // 0x15 ADC2
 // 0x1E UART2RX
 // DMA2REQbits.IRQSEL = 0x1F; // UART2TX

@@ -273,23 +273,11 @@ void cfgUart2_DMA(int freq)
 // TX DMA0 configuration
 void cfgDma0UartTx(void)
 {
-	//********************************************************************************
-	//  STEP 3:
-	//  Associate DMA Channel 0 with UART Tx
-	//********************************************************************************/
+
 	DMA0REQ = 0x001F;					// Select UART2 Transmitter
 	DMA0PAD = (volatile unsigned int) &U2TXREG;
 	
-	//********************************************************************************
-	//  STEP 5:
-	//  Configure DMA Channel 0 to:
-	//  Transfer data from RAM to UART
-	//  One-Shot mode
-	//  Register Indirect with Post-Increment
-	//  Using single buffer
-	//  8 transfers per buffer
-	//  Transfer words
-	//********************************************************************************/
+
 	//DMA0CON = 0x2001;					// One-Shot, Post-Increment, RAM-to-Peripheral
 	DMA0CONbits.AMODE = 0;
 	DMA0CONbits.MODE  = 1;
@@ -297,16 +285,10 @@ void cfgDma0UartTx(void)
 	DMA0CONbits.SIZE  = 0;
 	DMA0CNT = 15;						// 16 DMA requests
 
-	//********************************************************************************
-	//  STEP 6:
-	// Associate one buffer with Channel 0 for one-shot operation
-	//********************************************************************************/
+
 	DMA0STA = __builtin_dmaoffset(BufferA);
 
-	//********************************************************************************
-	//  STEP 8:
-	//	Enable DMA Interrupts
-	//********************************************************************************/
+	
 	IFS0bits.DMA0IF  = 0;			// Clear DMA Interrupt Flag
 	IEC0bits.DMA0IE  = 1;			// Enable DMA interrupt
     
@@ -364,35 +346,13 @@ void cfgDma1UartRx(void)
 
 
 
-//********************************************************************************
-//  STEP 7:
-//	Setup DMA interrupt handlers
-//	Force transmit after 8 words are received
-//********************************************************************************/
+
 void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void)
 {
 	IFS0bits.DMA0IF = 0;			// Clear the DMA0 Interrupt Flag;
 }
 
-//void __attribute__((interrupt, no_auto_psv)) _DMA1Interrupt(void)
-//{
-//	static unsigned int BufferCount = 0;  // Keep record of which buffer contains Rx Data
-//
-//	if(BufferCount == 0)
-//	{
-//		DMA0STA = __builtin_dmaoffset(BufferA); // Point DMA 0 to data to be transmitted
-//	}
-//	else
-//	{
-//		DMA0STA = __builtin_dmaoffset(BufferB); // Point DMA 0 to data to be transmitted
-//	}
-//
-//	DMA0CONbits.CHEN  = 1;			// Re-enable DMA0 Channel
-//	DMA0REQbits.FORCE = 1;			// Manual mode: Kick-start the first transfer
-//
-//	BufferCount ^= 1;				
-//	IFS0bits.DMA1IF = 0;			// Clear the DMA1 Interrupt Flag
-//}
+
 
 
 
