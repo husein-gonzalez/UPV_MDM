@@ -14,7 +14,7 @@ extern "C" {
 
 #include "system_G7.h"
     
-    extern unsigned int ADCValue;
+    extern unsigned int ADCValue,ADCValue2;
 
 
 

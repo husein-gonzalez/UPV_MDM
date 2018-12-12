@@ -141,6 +141,8 @@ void SYS_Initialize ( void )
     cfgDma0UartTx();//uart TX por DMAChannel 0
  //   cfgDma1UartRx();
 	cfgUart2_DMA(osc_8_80_F);	//  configuracion UART
-    Inic_CAD();
+  //  Inic_CAD();
+    Inic_CAD_1_DMA();
+    Inic_CAD_2_DMA();
 }
 

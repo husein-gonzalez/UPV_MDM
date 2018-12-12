@@ -593,10 +593,12 @@ Medidas1=0;
 
     if (flag_1s ==1)
     {
-        Medidas1++;
+      //  Medidas1=ADCValue;
       //  Led_D3=!Led_D3;
         LED_Toggle(LED_D3);
         flag_1s=0;
+      //  CAD1_encuesta();
+        Medidas1=ADCValue2;
        // escribir_UART_DMA(Texto_1);
    //     escribir_RX(Texto_RX);
 
