@@ -14,7 +14,7 @@ extern "C" {
 
 
     
-extern int contador_1ms,flag_1s, S3_F , S4_F,S5_F, S6_F;
+extern int contador_1ms,flag_1s, S3_F , S4_F,S5_F, S6_F,contador100ms, flag_100ms_ADC;
     
 void configura_CN_int(void);
 

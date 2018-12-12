@@ -546,6 +546,100 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
 }
 
 
+
+
+unsigned int media_potenci(void)        //devuelve el valor del potenciometro. media de las ultimas 4 lecturas. entre 0 y 9999
+{
+    unsigned int valor=0,i=0,potenc=0;
+    unsigned long intermedio=0;
+    
+    for(i=4;i<8;i++)        //segunda parte del buffer
+    {
+        valor += CAD_2_BuffA[i];
+    }
+    
+    valor = valor/4;
+    
+    intermedio= (unsigned long)valor;
+    intermedio= (unsigned long)((intermedio*9999));///1023;
+    intermedio= intermedio/1023;
+    
+    potenc=(unsigned int) intermedio;
+    
+    return potenc;
+}
+
+unsigned int media_temp(void)        //devuelve el valor del sensor de temp. media de las ultimas 4 lecturas. 
+{
+    unsigned int valor=0,i=0,temp=0;
+    
+    
+    for(i=0;i<4;i++)        //primera parte del buffer
+    {
+        valor += CAD_2_BuffA[i];
+    }
+    
+    valor = valor/4;
+    
+    temp= (valor-155)/3;  //cada bit del ADC son 3.3mA.  temp=  (tension -500mV)/10mV
+    
+    return temp;
+}
+
+unsigned int media_x(void)        //devuelve el valor del eje x del joystick. media de las ultimas 4 lecturas. de 0 a 180
+{
+    unsigned int valor=0,i=0,x=0;
+    unsigned long intermedio=0;
+    
+    for(i=0;i<8;i++)        
+    {
+        if(i%2==0)
+            valor += CAD_1_BuffA[i];
+    }
+    
+    valor = valor/4;
+    
+     
+    
+    intermedio= (unsigned long)valor;
+    intermedio= (unsigned long)((intermedio*180));
+    intermedio= intermedio/1023;
+    
+    x=(unsigned int) intermedio;
+    
+    return x;
+}
+
+unsigned int media_y(void)        //devuelve el valor del eje y del joystick. media de las ultimas 4 lecturas. de 0 a 180
+{
+    unsigned int valor=0,i=0,y=0;
+    unsigned long intermedio=0;
+    
+    for(i=0;i<8;i++)        
+    {
+        if(i%2==1)
+            valor += CAD_1_BuffA[i];
+    }
+    
+    valor = valor/4;
+    
+    
+    intermedio= (unsigned long)valor;
+    intermedio= (unsigned long)((intermedio*180));
+    intermedio= intermedio/1023;
+    
+    y=(unsigned int) intermedio;
+    
+    return y;
+}
+
+
+
+
+
+
+
+
 int main(void)
 {
     
@@ -591,6 +685,28 @@ Medidas1=0;
 
     //FIXME: sacar tiempo transcurrido por LCD o UART
 
+     if(flag_100ms_ADC==1)  //cada 100ms refresca los valores leidos por el ADC si ha saltado la interrupcion del DMA
+     {
+         
+         if(temp_poten_F==1)    //refresca valores del sensor de temperatura y del potenciometro
+         {
+             Medidas4=media_potenci(); //devuelve el valor medio de los 4 valores en buffer del potenciometro 
+             Medidas3=media_temp();  //devuelve el valor medio de los 4 valores en buffer de la temperatura 
+             temp_poten_F=0;
+         }
+         
+        if(joystick_F==1)    //refresca valores del joystick
+         {
+            Medidas5=media_x();  //devuelve el valor medio de los 4 valores en buffer del eje x del joystick 
+            Medidas6=media_y();  //devuelve el valor medio de los 4 valores en buffer del eje y del joystick
+            joystick_F=0;
+         }
+         
+         
+         flag_100ms_ADC=0;
+     }
+     
+     
     if (flag_1s ==1)
     {
       //  Medidas1=ADCValue;

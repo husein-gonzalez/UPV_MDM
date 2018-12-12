@@ -4,7 +4,7 @@
 
 
 
-int contador_1ms=0, flag_1s=0, S3_F=0 ,S4_F=0, S5_F=0, S6_F=0;
+int contador_1ms=0, flag_1s=0, S3_F=0 ,S4_F=0, S5_F=0, S6_F=0, contador100ms=0, flag_100ms_ADC=0;
 
 
 void configura_CN_int(void)
@@ -57,7 +57,22 @@ void _ISR _T1Interrupt(void)
     
     milis_F=1; //flag de 1ms
     milis_F2=1; //flag de 1ms
+   
     
+    
+    
+    if (contador100ms <100)
+    {
+        contador100ms++;
+    }
+    
+    else
+    {
+        flag_100ms_ADC=1;
+        contador100ms=0;
+    }
+            
+            
     if (contador_1ms <1000)
     {
         contador_1ms++;

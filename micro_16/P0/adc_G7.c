@@ -10,14 +10,14 @@ v0.0	Fecha: 2017-12-11
 #include "adc_G7.h"
 
 
-
+ 
 
 //#define _ISR_NO_PSV __attribute__((interrupt, no_auto_psv))
 
-unsigned int CAD_1_BuffA [32] __attribute__((space(dma)));
-unsigned int CAD_1_BuffB[32] __attribute__((space(dma)));
+unsigned int CAD_1_BuffA [TAM_BUFF_ADC] __attribute__((space(dma)));
+unsigned int CAD_2_BuffA[TAM_BUFF_ADC] __attribute__((space(dma)));
 
-unsigned int ADCValue,ADCValue2;
+unsigned int ADCValue,ADCValue2,temp_poten_F,joystick_F;
 
 //===============================================================
 void Inic_CAD (void)	// ENCUESTA / INTERRUPCION
@@ -182,14 +182,14 @@ AD1CHS0= 0; // Seleccion de entrada canal 0
 //_CH0SB = 3;
 //_CH0NB = 0;
 AD1CSSH = 0x0000; //Selecci?n entradas escaneo de la 16 a la 31
-AD1CSSL = 0x0330; //Selecci?n entradas escaneo de 0 a 15. Activa pines 4 5 8 9 
+AD1CSSL = 0x0300; //Selecci?n entradas escaneo de 0 a 15. Activa pines 4 5 8 9 
 //AD1CSSLbits.CSS2 =1;
 
 AD1PCFGH = 0xFFFF; //Configura entradas: 1= digital 0= Analog
 AD1PCFGL = 0xFFFF;
 //_PCFG0= // AN0
-_PCFG4 = 0; // AN4 -> RB4 -> Sensor Temperatura
-_PCFG5 = 0; // AN5 -> RB5 -> Potenci?metro
+//_PCFG4 = 0; // AN4 -> RB4 -> Sensor Temperatura
+//_PCFG5 = 0; // AN5 -> RB5 -> Potenci?metro
 _PCFG8 = 0; // 
 _PCFG9 = 0; // 
 
@@ -198,8 +198,8 @@ _AD1IE = 0; //IEC0
 // Bits DMA 
 AD1CON1bits.ADDMABM = 1; // 1=bufer DMA en modo ORDER
                          // 0=bufer DMA en modo Scatter/Gather
-//AD1CON2bits.SMPI = 2-1; //N?de puertos analog. conectados al CAD
-//AD1CON4bits.DMABL = 2; 	//N? datos por entrada (0->1,1->2,2->4,3->8,...,7->128 
+AD1CON2bits.SMPI = 2-1; //N?de puertos analog. conectados al CAD
+AD1CON4bits.DMABL = 2; 	//N? datos por entrada (0->1,1->2,2->4,3->8,...,7->128 
 						// INDIFERENTE EN ESTE MODO
 
 						AD1CON1bits.ADON = 1; //Habilita convertidor
@@ -249,7 +249,7 @@ DMA6STA = __builtin_dmaoffset(CAD_1_BuffA); // Inicio dir. offset
 
 DMA6PAD = (volatile unsigned int)&ADC1BUF0;
 
-DMA6CNT = 16-1; // N? de trasnsferencias -1
+DMA6CNT = 8-1; // N? de trasnsferencias -1
 
 DMACS0 = 0; // Borra Colisiones
 _DMA6IP = 3;// prioridad Int.
@@ -264,6 +264,8 @@ DMA6CONbits.CHEN = 1; // Activa canal 2 DMA
 void _ISR_NO_PSV _DMA6Interrupt(void) {
     Nop();
     Nop();
+    
+    joystick_F=1;
 
     _DMA6IF = 0;
 }
@@ -331,21 +333,22 @@ AD2CHS0= 0; // Seleccion de entrada canal 0
 //_CH0SB = 3;
 //_CH0NB = 0;
 //AD2CSSH = 0x0000; //Selecci?n entradas escaneo de la 16 a la 31
-AD2CSSL = 0x0330; //Selecci?n entradas escaneo de 0 a 15. Activa pines 4 5 8 9 
+//AD2CSSL = 0x0330; //Selecci?n entradas escaneo de 0 a 15. Activa pines 4 5 8 9 
+AD2CSSL = 0x0030;
 //AD2CSSLbits.CSS2 =1;
 
 AD2PCFGL = 0xFFFF; 
 AD2PCFGLbits.PCFG4 = 0; 
 AD2PCFGLbits.PCFG5 = 0;  
-AD2PCFGLbits.PCFG8 = 0;
-AD2PCFGLbits.PCFG9 = 0;
+//AD2PCFGLbits.PCFG8 = 0;
+//AD2PCFGLbits.PCFG9 = 0;
 
 _AD2IF = 0; //IFS0
 _AD2IE = 0; //IEC0
 // Bits DMA 
 AD2CON1bits.ADDMABM = 0; // 1=bufer DMA en modo ORDER
                          // 0=bufer DMA en modo Scatter/Gather
-AD2CON2bits.SMPI = 4-1; //N?de puertos analog. conectados al CAD
+AD2CON2bits.SMPI = 2-1; //N?de puertos analog. conectados al CAD
 AD2CON4bits.DMABL = 2; 	//N? datos por entrada (0->1,1->2,2->4,3->8,...,7->128 
 						// INDIFERENTE EN ESTE MODO
 
@@ -391,12 +394,12 @@ DMA5REQbits.IRQSEL = 0x15; // ADC1 //DMA_IRQ_ADC1 //FIXME usar el ADC2
 // 0x37 ECAN2-RX
 // 0x46 ECAN1-TX
 // 0x47 ECAN2-TX
-DMA5STA = __builtin_dmaoffset(CAD_1_BuffB); // Inicio dir. offset
+DMA5STA = __builtin_dmaoffset(CAD_2_BuffA); // Inicio dir. offset
 //DMA2STB = __builtin_dmaoffset(CAD_BuffB); // Inicio dir. offset
 
 DMA5PAD = (volatile unsigned int)&ADC2BUF0;
 
-DMA5CNT = 16-1; // N? de trasnsferencias -1
+DMA5CNT = 8-1; // N? de trasnsferencias -1
 
 DMACS0 = 0; // Borra Colisiones
 _DMA5IP = 3;// prioridad Int.
@@ -411,6 +414,8 @@ DMA5CONbits.CHEN = 1; // Activa canal 2 DMA
 void _ISR_NO_PSV _DMA5Interrupt(void) {
     Nop();
     Nop();
+    
+    temp_poten_F=1;
 
     _DMA5IF = 0;
 }

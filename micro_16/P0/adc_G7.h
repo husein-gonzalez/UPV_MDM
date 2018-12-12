@@ -14,7 +14,11 @@ extern "C" {
 
 #include "system_G7.h"
     
-    extern unsigned int ADCValue,ADCValue2;
+#define TAM_BUFF_ADC 16 
+    
+extern unsigned int ADCValue,ADCValue2,temp_poten_F,joystick_F;;
+extern unsigned int CAD_1_BuffA [TAM_BUFF_ADC] __attribute__((space(dma)));
+extern unsigned int CAD_2_BuffA[TAM_BUFF_ADC] __attribute__((space(dma)));
 
 
 
