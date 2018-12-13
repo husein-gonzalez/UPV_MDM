@@ -16,7 +16,8 @@ Descripci?n:
 #include "system_G7.h"
 
 
-#define ROWS 7
+
+//#define ROWS 7
 #define COLUMNS 16
 
 
@@ -31,12 +32,14 @@ int avance_display=0;
 int filas;
 int filasUART;
 unsigned int Medidas1 = 1234;
-unsigned int Medidas2 = 0000;
-unsigned int Medidas3 = 0000;
-unsigned int Medidas4 = 0000;
-unsigned int Medidas5 = 0000;
-unsigned int Medidas6 = 0000;
-unsigned int Medidas7 = 0000;
+unsigned int Medidas2 = 1001;
+unsigned int Medidas3 = 2002;
+unsigned int Medidas4 = 3003;
+unsigned int Medidas5 = 4004;
+unsigned int Medidas6 = 5005;
+unsigned int Medidas7 = 6006;
+uint8_t FinUart;
+uint8_t FinLCD = 0;
 //unsigned int Medidas3;
 //unsigned int Medidas4;
 //unsigned int Medidas5;
@@ -51,12 +54,13 @@ unsigned int Medidas7 = 0000;
 
 
 unsigned char Texto_1[ ] = {"== MISE G7 ="     // 16 caracteres línea 1 
+                            "==Pulse S4=="
                             "Temperatura:"
-                            "Resistencia:"
-                            "TMR:       _"
-                            "Medida 4:___"
-                            "Medida 5:___"
-                            "Medida 6:___"};  // 16 caracteres línea 2 
+                            "Potenciom.: "
+                            "Eje x:      "
+                            "Eje y:      "
+                            "Frec. Oscil:"};
+                            //"Medida 6:___"};  // 16 caracteres línea 2 
 
 char borra_pantalla[]= {"         \x1b[2J"}; // Borra pantalla 0x1b, '[','2','J'
 char cursor_inicio[]=  {"          \x1b[H"};// Cursor inicio
@@ -75,6 +79,22 @@ enum{
     ESCRIBE_LINEA
 };
 
+void  contadores100ms(void)
+{
+
+    if(flag_100ms)
+    {
+        //Mensaje_FLASH_Ventana_DATOS_mejorado(Texto_1,filasUART);
+        
+      
+        Nop();
+        Nop();
+        Nop();
+    
+        flag_100ms=0;
+    }
+}
+
 
 void Inicializacion_variables(void)
 {
@@ -88,41 +108,10 @@ void Inicializacion_variables(void)
     filasUART = 0;
 }
 
-
-void ConvierteMedida(int n_medida, unsigned char *ValorMed)
-{
-   // int valor = Medidas1 ;//fixme cargar la variable que si es
-    int valor; //fixme cargar la variable que si es
-    int valor1 = 0;//fixme cargar la variable que si es
-    int i;
-   
-    switch(n_medida)
+    void ConvierteValorAString (char *ValorMed, int valor)
     {
-            case 0:
-                valor = Medidas1;
-                break;
-            case 1:
-                valor = Medidas1;
-                break;
-            case 2:
-                valor = Medidas3;
-                break;
-            case 3:
-                valor = Medidas4;
-                break;
-            case 4:
-                valor = Medidas5;
-                break;
-            case 5:
-                valor = Medidas6;
-                break;
-            case 6:
-                valor = Medidas7;
-                break;
-    }
-//    for (i=0; i < 4; i++)
-//    {
-        //ValorMed[3] = ((valor%1000)+ '0');
+        int valor1;
+        
         valor1 = valor/1000;
         ValorMed[0] = valor1+'0';
         valor = (valor%1000);
@@ -133,22 +122,153 @@ void ConvierteMedida(int n_medida, unsigned char *ValorMed)
         ValorMed[2] = valor1+'0';
         valor = valor%10;
         valor1 = valor;
-        ValorMed[3] = (valor1+'0');
+        ValorMed[3] = (valor1+'0');   
+        
+    }
+
+
+void ConvierteMedida(int n_medida, unsigned char *ValorMed)
+{
+   // int valor = Medidas1 ;//fixme cargar la variable que si es
+    int valor; //fixme cargar la variable que si es
+    int valor1 = 0;//fixme cargar la variable que si es
+    int i;
+   
+    switch(n_medida)
+    {
+//            case 0:
+//                valor = Medidas1;
+//                break;
+            case 1:     //mise
+                valor = Medidas1;
+                ValorMed[0] = 00;
+                ValorMed[1] = 00;
+                ValorMed[2] = 00;
+                ValorMed[3] = 00;
+                break;
+            case 2:     //puulsador
+                valor = Medidas2;
+                ValorMed[0] = "";
+                ValorMed[1] = "";
+                ValorMed[2] = "";
+                ValorMed[3] = "";
+                break;
+            case 3:     //temperatura
+                
+                valor = Medidas3;
+                ConvierteValorAString(ValorMed, valor);
+                break;  
+            case 4:     //Potenciometro
+                valor = Medidas4;
+                ConvierteValorAString(ValorMed, valor);
+                break;
+            case 5:     //eje x
+                valor = Medidas5;
+                ConvierteValorAString(ValorMed, valor);
+                break;
+            case 6:     //eje Y
+                valor = Medidas6;
+                ConvierteValorAString(ValorMed, valor);
+                break;
+            case 7:     //Frec Oscilador
+               // valor = Medidas7;
+                if(osc_8_80_F)
+                {
+//                    ValorMed[0] = 'H';
+//                    ValorMed[1] = 'M';
+//                    ValorMed[2] = '0';
+//                    ValorMed[3] = '8';
+                valor = 80;
+
+                }
+                else
+                {
+//                    ValorMed[0] = 'z';
+//                    ValorMed[1] = 'H';
+//                    ValorMed[2] = 'M';
+//                    ValorMed[3] = '8';
+                
+                valor = 8;
+                }
+                ConvierteValorAString(ValorMed, valor);
+                break;
+        default:
+                valor = 9999;
+                break;
+    }
+
+       
 //        valor = valor/10;
 //    }
     
    
-    
-
 
 
 
 
 }
 
+void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto) 
+{ 
+//unsigned char i, j; 
+//unsigned char i; 
+unsigned int k; 
+unsigned char ValorMed[4]; 
+int j;//,k;
+int avance;
+j=0;
+//j= avance * long_linea_txt;
+Nop();
+Nop();
+Nop();
+    for(avance = 0; avance<num_lineas ; avance++)
+    {
+       // j=0;
+        Nop();
+        Nop();
+        Nop();
+        k=0;
+          for(k=0; k<long_linea_txt; k++, j++) 
+          {      
+            Ventana_DATOS[avance][k] = texto[j] ; 
+          } 
+          //k=j;
+          ConvierteMedida(avance+1, ValorMed);
+          //for(k=long_linea_txt; k<long_linea; k++, j++) 
+          for(k=long_linea_txt; k<long_linea; k++) 
+          {    
+
+            Ventana_DATOS[avance][k] = ValorMed[k-long_linea_txt];//caracter "1" 
+          } 
+          
+          Nop();
+          Nop();
+          Nop();
+          Nop();
+          //j=k;
+    }
+    Nop();
+    Nop();
+    Nop();
+      /*  j=k;
+      for(i=0;i<long_linea_txt;i++,j++)      
+      {      
+        Ventana_DATOS[1][i] = texto[j] ; 
+      }
+        ConvierteMedida(avance+2, ValorMed);
+ 		for(i=long_linea_txt; i<long_linea; i++, j++) 
+      {      
+         Ventana_DATOS[1][i] = ValorMed[i-long_linea_txt];//caracter "5" 
+      }      
+*/
+    Nop();
+    Nop();
+} //FIN Mensaje_FLASH_Ventana_DATOS
+
 
 
 //=== Pasa un texto de FLASH a RAM y 
+/*  susana copia funcion antes de cambios. Borrar!
 void Mensaje_FLASH_Ventana_DATOS_mejorado (unsigned char *texto, int avance) 
 { 
 //unsigned char i, j; 
@@ -184,7 +304,7 @@ j= avance * long_linea_txt;
     Nop();
 } //FIN Mensaje_FLASH_Ventana_DATOS
 
-
+*/
 
 //=== Pasa un texto de FLASH a RAM y 
 void Mensaje_FLASH_Ventana_DATOS (unsigned char *texto) 
@@ -280,7 +400,7 @@ void escribir_UART_DMA(char *txtPrintable)
 
     
     
-    for(j=0;j<ROWS;j++)
+    for(j=0;j<num_lineas;j++)
     {        
         for(i=0;i<COLUMNS;i++)
         {
@@ -319,12 +439,12 @@ void escribir_UART_DMA(char *txtPrintable)
     {
         case INICIO_UART:
           
-              if (columnaUART > 16)//fixme usar define                        
+            if (columnaUART > 16)//fixme usar define                        
             {          
                  //// delay_ms(50);
                      DMA0CONbits.CHEN  = 1;	
                      DMA0REQbits.FORCE = 1;	
-                     delay_ms(50);
+                    // delay_ms(5);  //susana1
                     columnaUART = 0;
                     EscrituraUART = CURSOR_INICIO;
                     filasUART = 0;
@@ -338,15 +458,22 @@ void escribir_UART_DMA(char *txtPrintable)
             break;
         case CURSOR_INICIO:
           
-              if (columnaUART > 16)//fixme usar define                        
-            {          
-                     delay_ms(50);
-                     DMA0CONbits.CHEN  = 1;	
-                     DMA0REQbits.FORCE = 1;	
-                     delay_ms(50);
-                    columnaUART = 0;
-                    EscrituraUART = SALTO_DE_CARRO;
-                    filasUART = 0;
+            if (columnaUART >= 15)//fixme usar define                        
+            {        
+//                 if(columnaUART = 15)
+//                {
+//                    BufferA[columnaUART] = " ";
+//                }
+//                else
+//                {
+                         //delay_ms(5);
+                    DMA0CONbits.CHEN  = 1;	
+                    DMA0REQbits.FORCE = 1;	
+                   // delay_ms(5);
+                   columnaUART = 0;
+                   EscrituraUART = SALTO_DE_CARRO;
+                   filasUART = 0;
+//                }
             }
             else
             {
@@ -374,10 +501,10 @@ void escribir_UART_DMA(char *txtPrintable)
                  }
                  else
                  {
-                     delay_ms(50);
+                     //delay_ms(5);
                      DMA0CONbits.CHEN  = 1;	
                      DMA0REQbits.FORCE = 1;	
-                     delay_ms(50);
+                    // delay_ms(5);
                  columnaUART = 0;
                  EscrituraUART = ESCRIBE_LINEA;
                  }
@@ -387,28 +514,32 @@ void escribir_UART_DMA(char *txtPrintable)
         case ESCRIBE_LINEA:
             if(columnaUART ==0)
             {
-                 Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,filasUART);                  
+                // Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,filasUART);                  
             
             
             }
             if (columnaUART == 16)//fixme usar define                        
             {          
                 filasUART++;
-                if(filasUART == ROWS)
+                if(filasUART == num_lineas)
+                {
                     EscrituraUART = INICIO_UART;
+                    FinUart = 1;
+                }
                 else
                     EscrituraUART = SALTO_DE_CARRO;
                 columnaUART = 0;
                // EscrituraUART = SALTO_DE_CARRO;
-                delay_ms(50);
+                //delay_ms(5);
                 DMA0CONbits.CHEN  = 1;	
                 DMA0REQbits.FORCE = 1;	
-                delay_ms(50);
+               // delay_ms(5);
             }
             else
             {
                 //BufferA[columnaUART] = 0x41;
-                BufferA[columnaUART] = Ventana_DATOS[0][columnaUART];
+                //BufferA[columnaUART] = Ventana_DATOS[0][columnaUART];
+                BufferA[columnaUART] = Ventana_DATOS[filasUART][columnaUART];
                 columnaUART++;
             }
             break;      
@@ -451,7 +582,7 @@ void escribir_UART_DMA(char *txtPrintable)
 
     
     
-//    for(j=0;j<ROWS;j++)
+//    for(j=0;j<num_lineas;j++)
 //    {        
 //        for(i=0;i<COLUMNS;i++)
 //        {
@@ -480,11 +611,9 @@ void escribir_UART_DMA(char *txtPrintable)
 void EnvioDatosLCD(unsigned char* txtPrintable)
 {
 //    char c;
-    
-    
+
     if (milis_F2)
     {     
-
         char c= "1";
         switch(EscrituraLCD)
         {
@@ -495,7 +624,7 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
                 avance_display = 0;
                 EscrituraLCD = DATO;
             case DATO:               
-                Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,avance_display);                  
+                //Mensaje_FLASH_Ventana_DATOS_mejorado(txtPrintable,avance_display);                  
                 lcd_cmd(0x01);
                 delay_ms(5);
                 lcd_cmd(0x02);
@@ -504,7 +633,7 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
                 delay_ms(5);
                 EscrituraLCD = FILA1;
             case FILA1:
-  					lcd_data(Ventana_DATOS[0][columnaLCD]);
+  					lcd_data(Ventana_DATOS[filas][columnaLCD]);
                     columnaLCD++;
                     if (columnaLCD ==16)//fixme usar define                        
                     {
@@ -519,16 +648,17 @@ void EnvioDatosLCD(unsigned char* txtPrintable)
             case FILA2:
   					if (columnaLCD < 16)//fixme usar define                        
                     {
-                        lcd_data(Ventana_DATOS[1][columnaLCD]);
+                        lcd_data(Ventana_DATOS[filas+1][columnaLCD]);
                         columnaLCD++;
                     }    
                     else
                     {
-                       EscrituraLCD = EVALUA;                                      
+                       EscrituraLCD = EVALUA;   
+                       FinLCD = 1;
                     }
             break;                    
             case EVALUA:
-
+                    
                 break;
            
         }
@@ -583,12 +713,20 @@ LED_Off(ALL);
 //    tiempo_exec=time_diff(0);  //0 empieza el contador, 1 devuelve tiempo transcurrido
 //    delay_ms(5);
 //    tiempo_exec=time_diff(1);  //0 empieza el contador, 1 devuelve tiempo transcurrido
-
-    EnvioDatosLCD(Texto_1);
-     escribir_UART_DMA(Texto_1);
-
+    Mensaje_FLASH_Ventana_DATOS_mejorado(Texto_1);
+    while(FinLCD==0)
+    {
+        EnvioDatosLCD(Texto_1);
+    }
+    FinUart = 0;
+    while(FinUart==0)
+    {
+        escribir_UART_DMA(Texto_1);
+        delay_ms(2);
+    }
+    delay_ms(500);
     //FIXME: sacar tiempo transcurrido por LCD o UART
-
+     contadores100ms();
     if (flag_1s ==1)
     {
 
@@ -628,6 +766,7 @@ LED_Off(ALL);
                     if(filas < num_lineas_txt-2)
                     {
                         filas++;
+                        FinLCD = 0;
                         EscrituraLCD = DATO;
                         columnaLCD = 0;  
                         avance_display++;
@@ -640,6 +779,7 @@ LED_Off(ALL);
                     if(filas > 0)
                     {
                         filas--;
+                        FinLCD = 0;
                         EscrituraLCD = DATO;
                         columnaLCD = 0;  
                         avance_display--;

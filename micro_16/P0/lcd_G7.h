@@ -38,8 +38,8 @@ extern "C" {
 #define long_linea 16
 #define long_linea_txt 12
 #define num_lineas_txt 7
-#define num_lineas 2
-extern unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
+#define num_lineas 7
+extern unsigned char Ventana_DATOS [num_lineas+1][long_linea] __attribute__((space(dma)));             
 
 //CABECERAS DE FUNCIONES DE LIBRERIA
 void lcd_cmd( char cmd );

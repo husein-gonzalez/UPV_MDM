@@ -9,7 +9,7 @@
 
 
 
-unsigned char Ventana_DATOS [num_lineas][long_linea] __attribute__((space(dma)));             
+unsigned char Ventana_DATOS [num_lineas+1][long_linea] __attribute__((space(dma)));             
 
 
 
